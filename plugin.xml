@@ -1,0 +1,11 @@
+<!-- 
+  Learning 2 Domain (questions and answers) HTML generation.
+  
+  Provides base support for generating HTML from learning2
+  interactions.
+  
+  
+  -->
+<plugin id="org.dita.learning2.html">
+  <feature extension="dita.xsl.xhtml" value="xsl/learning2domain2html.xsl" type="file"/>  
+</plugin>
