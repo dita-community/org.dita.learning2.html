@@ -37,12 +37,26 @@
   </xsl:template>
   
   <xsl:template match="*[contains(@class, ' learning2-d/lcOpenQuestion2 ')]">
+    <xsl:message> + [DEBUG] learning2-d/lcOpenQuestion2</xsl:message>
     <xsl:next-match/>
   </xsl:template>
   
+  <!-- + topic/div learningInteractionBase2-d/lcInteractionBase2 learning2-d/lcOpenQuestion2  -->
   <xsl:template match="*[contains(@class, ' learningInteractionBase2-d/lcInteractionBase2 ')]"
       priority="-0.5"
     >
+    <xsl:message> + [DEBUG] learningInteractionBase2-d/lcInteractionBase2: <xsl:value-of select="concat(name(..), '/', name(.))"/></xsl:message>
+    <!-- Fallback handling for interactions -->
+    <div>
+      <xsl:call-template name="commonattributes"/>
+      <xsl:apply-templates/>
+    </div>
+  </xsl:template>
+  
+  <xsl:template match="*[contains(@class, ' topic/div ')]"
+      priority="-0.5"
+    >
+    <xsl:message> + [DEBUG] topic/div: <xsl:value-of select="concat(name(..), '/', name(.))"/></xsl:message>
     <!-- Fallback handling for interactions -->
     <div>
       <xsl:call-template name="commonattributes"/>
