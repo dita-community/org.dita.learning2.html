@@ -4,6 +4,9 @@
  <title>Learning 2 Test Cases</title>
  <shortdesc>Tests for learning2 interactions</shortdesc>
   <learningAssessmentbody>
+    <section><title>Topic/Div Test</title>
+      <p>This is a generic &lt;div> element: <div>The content of the div.</div></p>
+    </section>
     <section> <title>Interactions with no answers or feedback</title> <p>These interactions have no answers or feedback. They reflect the simplest use of the markup.</p> <lcOpenQuestion2
       id="lcOpenQuestion_kgx_1wc_jp">
       <lcQuestion2>This is an open question interaction: The struggle of class against class is what kind of struggle? Explain your answer.</lcQuestion2>

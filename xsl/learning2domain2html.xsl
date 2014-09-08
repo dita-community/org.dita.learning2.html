@@ -60,6 +60,8 @@
   <!-- Static suffix to put after question numbers. Default is " " (Single space). -->
   <xsl:param name="lc-question-number-suffix" as="xs:string" select="' '"/>
   
+  <xsl:include href="plugin:org.dita.dita13base.html:xsl/dita13base2html.xsl"/>
+  
   <!-- =====================
        True/False
        ===================== -->
@@ -196,17 +198,6 @@
       priority="-0.5"
     >
     <xsl:message> + [DEBUG] learningInteractionBase2-d/lcInteractionBase2: <xsl:value-of select="concat(name(..), '/', name(.))"/></xsl:message>
-    <!-- Fallback handling for interactions -->
-    <div>
-      <xsl:call-template name="commonattributes"/>
-      <xsl:apply-templates/>
-    </div>
-  </xsl:template>
-  
-  <xsl:template match="*[contains(@class, ' topic/div ')]"
-      priority="-0.5"
-    >
-    <xsl:message> + [DEBUG] topic/div: <xsl:value-of select="concat(name(..), '/', name(.))"/></xsl:message>
     <!-- Fallback handling for interactions -->
     <div>
       <xsl:call-template name="commonattributes"/>

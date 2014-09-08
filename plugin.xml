@@ -7,5 +7,6 @@
   
   -->
 <plugin id="org.dita.learning2.html">
+  <require plugin="org.dita.dita13base.html"/>
   <feature extension="dita.xsl.xhtml" value="xsl/learning2domain2html.xsl" type="file"/>  
 </plugin>
