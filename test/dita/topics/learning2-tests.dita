@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE learningAssessment PUBLIC "-//OASIS//DTD DITA Learning Assessment//EN" "learningAssessment.dtd">
+<learningAssessment id="assessment_agl_qdd_jp">
+ <title>Learning 2 Test Cases</title>
+ <shortdesc>Tests for learning2 interactions</shortdesc>
+  <learningAssessmentbody>
+    <section>
+      <title>Interactions with no answers or feedback</title>
+      <p>These interactions have no answers or feedback. They reflect the simplest use of the markup.</p>
+      <lcOpenQuestion2 id="lcOpenQuestion_kgx_1wc_jp">
+        <lcQuestion2>This is an open question interaction: Fill in this blank: <ph>_____________</ph>.</lcQuestion2>
+      </lcOpenQuestion2>
+      <lcSingleSelect2 id="lcSingleSelect_tq4_bxc_jp">
+        <lcQuestion2>Single select: Choose the correct answer:</lcQuestion2>
+        <lcAnswerOptionGroup2 id="lcAnswerOptionGroup2_ar4_bxc_jp">
+          <lcAnswerOption2>
+            <lcAnswerContent2>42</lcAnswerContent2>
+          </lcAnswerOption2>
+          <lcAnswerOption2>
+            <lcAnswerContent2>What is 6x7</lcAnswerContent2>
+          </lcAnswerOption2>
+          <lcAnswerOption2>
+            <lcAnswerContent2>Life is an illusion</lcAnswerContent2>
+          </lcAnswerOption2>
+          <lcAnswerOption2>
+            <lcAnswerContent2>Neatness always counts</lcAnswerContent2>
+            <lcCorrectResponse2/>
+          </lcAnswerOption2>
+        </lcAnswerOptionGroup2>
+      </lcSingleSelect2>
+      <lcMultipleSelect2 id="lcMultipleSelect_acs_jxc_jp">
+        <lcQuestion2>This is a multi-select: Choose all that apply:</lcQuestion2>
+        <lcAnswerOptionGroup2 id="lcAnswerOptionGroup2_mcs_jxc_jp">
+          <lcAnswerOption2>
+            <lcAnswerContent2>Love will conquer all</lcAnswerContent2>
+            <lcCorrectResponse2/>
+          </lcAnswerOption2>
+          <lcAnswerOption2>
+            <lcAnswerContent2>All you need is love</lcAnswerContent2>
+            <lcCorrectResponse2/>
+          </lcAnswerOption2>
+          <lcAnswerOption2>
+            <lcAnswerContent2>Love is the answer</lcAnswerContent2>
+            <lcCorrectResponse2/>
+          </lcAnswerOption2>
+          <lcAnswerOption2>
+            <lcAnswerContent2>Love the one you're with</lcAnswerContent2>
+          </lcAnswerOption2>
+        </lcAnswerOptionGroup2>
+      </lcMultipleSelect2>
+      <lcMatching2 id="lcMatching_dqm_4xc_jp">
+        <lcQuestion2>This is a matching question. Match the artist with the work:</lcQuestion2>
+        <lcMatchTable2 id="lcMatchTable2_vqm_4xc_jp">
+          <lcMatchingPair2>
+            <lcItem2>Dega</lcItem2>
+            <lcMatchingItem2>Ballet Rehersal</lcMatchingItem2>
+          </lcMatchingPair2>
+          <lcMatchingPair2>
+            <lcItem2>Monet</lcItem2>
+            <lcMatchingItem2>Water Lilly Pond</lcMatchingItem2>
+          </lcMatchingPair2>
+          <lcMatchingPair2>
+            <lcItem2>Matise</lcItem2>
+            <lcMatchingItem2>Dance</lcMatchingItem2>
+          </lcMatchingPair2>
+          <lcMatchingPair2>
+            <lcItem2>Cassat</lcItem2>
+            <lcMatchingItem2>Little Girl in Blue Armchair</lcMatchingItem2>
+          </lcMatchingPair2>
+        </lcMatchTable2>
+      </lcMatching2>
+      <lcHotspot2 id="lcHotspot_ec5_yxc_jp">
+        <lcQuestion2>This is a hotspot question. This is a diorama of the Apollo 11 moon landing, using a real Lunar Lander that was never sent to space. It represents the initial egress of the astronaunts onto the lunar surface. Based on your knowledge of the Apollo 11 mission, select Neil Armstrong.</lcQuestion2>
+        <lcHotspotMap2 id="lcHotspotMap_kd5_yxc_jp">
+          <image href="media/moon-landing-01.JPG" id="image_l5g_5yc_jp">
+            <alt>Diorama of the Apollo 11 moon landing (National Air and Space Museum)</alt>
+          </image>
+          <lcArea2 id="aldrin">
+            <lcAreaShape2>rect</lcAreaShape2>
+            <lcAreaCoords2>363,15,594,353</lcAreaCoords2>
+          </lcArea2>
+          <lcArea2 id="armstrong">
+            <lcAreaShape2>rect</lcAreaShape2>
+            <lcAreaCoords2>65,231,218,445</lcAreaCoords2>
+            <lcCorrectResponse2/>
+          </lcArea2>
+        </lcHotspotMap2>
+      </lcHotspot2>
+      <lcTrueFalse2 id="lcTrueFalse_ukc_y1d_jp">
+        <lcQuestion2>This is a true-false question: Neil Armstrong crashed a lunar lander simulator during training, walked away from the crash, and was seen calmly sitting in his office an hour later.</lcQuestion2>
+        <lcAnswerOptionGroup2 id="lcAnswerOptionGroup2_ylc_y1d_jp">
+          <lcAnswerOption2>
+            <lcAnswerContent2>True</lcAnswerContent2>
+          </lcAnswerOption2>
+          <lcAnswerOption2>
+            <lcAnswerContent2>False</lcAnswerContent2>
+          </lcAnswerOption2>
+        </lcAnswerOptionGroup2>
+      </lcTrueFalse2>
+      <lcSequencing2 id="lcSequencing_bqd_hbd_jp">
+        <lcQuestion2>This is a sequencing question: Put the painters in order of date of birth:</lcQuestion2>
+        <lcSequenceOptionGroup2 id="lcSequenceOptionGroup2_nrd_hbd_jp">
+          <lcSequenceOption2>
+            <lcAnswerContent2>Vincent van Gogh <!--(1853)--></lcAnswerContent2>
+            <lcSequence2 value="4"/>
+          </lcSequenceOption2>
+          <lcSequenceOption2>
+            <lcAnswerContent2>Paul Cézanne <!--(1839)--></lcAnswerContent2>
+            <lcSequence2 value="1"/>
+          </lcSequenceOption2>
+          <lcSequenceOption2>
+            <lcAnswerContent2>Claude Monet <!--(1840)--></lcAnswerContent2>
+            <lcSequence2 value="2"/>
+          </lcSequenceOption2>
+          <lcSequenceOption2>
+            <lcAnswerContent2>Mary Cassat <!--(1844)--></lcAnswerContent2>
+            <lcSequence2 value="3"/>
+          </lcSequenceOption2>
+        </lcSequenceOptionGroup2>
+      </lcSequencing2>
+    </section>
+  </learningAssessmentbody>
+</learningAssessment>
