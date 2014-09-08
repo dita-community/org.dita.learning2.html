@@ -8,7 +8,9 @@
       <title>Interactions with no answers or feedback</title>
       <p>These interactions have no answers or feedback. They reflect the simplest use of the markup.</p>
       <lcOpenQuestion id="lcOpenQuestion_kgx_1wc_jp">
-        <lcQuestion>This is an open question interaction: Fill in this blank: <ph>_____________</ph>.</lcQuestion>
+        <lcQuestion>This is an open question interaction: 
+          The struggle of class against class is what kind of struggle? 
+          Explain your answer.</lcQuestion>
       </lcOpenQuestion>
       <lcSingleSelect id="lcSingleSelect_tq4_bxc_jp">
         <lcQuestion>Single select: Choose the correct answer:</lcQuestion>
