@@ -2,8 +2,6 @@
  * CSS for Learning and Training interactions (assessment questions and answers) 
  */ 
  
- @import url(commonltr.css);
- 
  .lcQuestionNumber {
    font-weight: bold;
  }

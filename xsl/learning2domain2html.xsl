@@ -87,6 +87,25 @@
   -->
   <xsl:param name="lc-answer-option-number-format" as="xs:string" select="'A.'"/>
   
+  <xsl:variable name="baseBlockTypes" as="xs:string*"
+     select="('dl',
+              'fig',
+              'image',
+              'lines',
+              'lq',
+              'note',
+              'object',
+              'ol',
+              'p',
+              'pre',
+              'simpletable',
+              'sl',
+              'table',
+              'ul',
+              'shortdesc')"
+  />
+
+  
   <xsl:include href="plugin:org.dita.dita13base.html:xsl/dita13base2html.xsl"/>
   
   <!-- =====================
@@ -152,7 +171,7 @@
           select="'lcAnswerOption', if ($isCorrectAnswer) then 'lc-correct-response' else ''" 
         />
       </xsl:call-template>
-      <xsl:apply-templates select="." mode="lc-set-answer-option-label"/>
+<!--      <xsl:apply-templates select="." mode="lc-set-answer-option-label"/>-->
       <div class="lc-answer-option-content">
         <xsl:apply-templates/>
       </div>
@@ -234,23 +253,23 @@
   
   <xsl:template name="constructInteractionWithAnswerOptionGroup">
     <xsl:param name="baseClass" as="xs:string*" select="lc:getBaseLcTypeForElement(.)"/>
+    <xsl:variable name="interactionContents" as="node()*">
+    </xsl:variable>
     <div class="lc-interaction-wrapper">
+      <xsl:call-template name="commonattributes"/>
+      <xsl:call-template name="lc-setClassAtt">
+        <xsl:with-param name="baseClass" select="$baseClass" as="xs:string*"/>
+      </xsl:call-template>
       <xsl:apply-templates 
           select="*[contains(@class, ' learningInteractionBase2-d/lcInteractionLabel2 ')]"/>
-      <p>
-        <xsl:call-template name="commonattributes"/>
-        <xsl:call-template name="lc-setClassAtt">
-          <xsl:with-param name="baseClass" select="$baseClass" as="xs:string*"/>
-        </xsl:call-template>
-        <xsl:apply-templates 
-          select="*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')] |
-                  *[contains(@class, ' learningInteractionBase-d/lcQuestionBase ')]"
-        />
-        <xsl:apply-templates 
-          select="*[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')] |
-                  *[contains(@class, ' learning-d/lcAnswerOptionGroup ')]"
-        />
-      </p>
+      <xsl:apply-templates 
+        select="*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')] |
+                *[contains(@class, ' learningInteractionBase-d/lcQuestionBase ')]"
+      />
+      <xsl:apply-templates 
+        select="*[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')] |
+                *[contains(@class, ' learning-d/lcAnswerOptionGroup ')]"
+      />
     </div>
   </xsl:template>
   
@@ -261,24 +280,89 @@
     </p>
   </xsl:template>
 
-  <xsl:template match="*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')] |
-                       *[contains(@class, ' learningInteractionBase-d/lcQuestionBase ')]">
+  <xsl:template match="*[contains(@class, ' learningInteractionBase-d/lcQuestionBase ')]">
     <xsl:variable name="baseClass" as="xs:string"
       select="concat(lc:getBaseLcTypeForElement(..), 'Question')"
     />
-    <div>
+    <!-- For learning1, lcQuestionBase specializes <p> --> 
+    <p>
       <xsl:call-template name="lc-setClassAtt">
         <xsl:with-param name="baseClass" select="$baseClass" as="xs:string*"/>
       </xsl:call-template>
       <xsl:call-template name="lcGetQuestionNumber"/>
       <span class="lcQuestionText"><xsl:apply-templates/></span>
+    </p>
+  </xsl:template>
+  
+  <xsl:template match="*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')]">
+    <xsl:variable name="baseClass" as="xs:string"
+      select="concat(lc:getBaseLcTypeForElement(..), 'Question')"
+    />
+    <!-- For learning2, lcQuestionBase specializes <div> and may contain just text
+         or block elements.
+      -->
+    <xsl:variable name="questionNumber" as="node()*">
+      <xsl:call-template name="lcGetQuestionNumber"/>
+    </xsl:variable>
+    <xsl:variable name="textBeforeBlocks">
+      <xsl:sequence select="(text() | *[not(lc:isBlock(.))])[not(preceding-sibling::*[lc:isBlock(.)])]"/>
+    </xsl:variable>
+    <xsl:variable name="hasTextBeforeBlocks" as="xs:boolean"
+      select="normalize-space(string($textBeforeBlocks)) != ''"
+    />
+    <xsl:variable name="firstPara" as="node()*">
+      <xsl:choose>
+        <xsl:when test="not($hasTextBeforeBlocks) and lc:hasBlockChildren(.)">
+          <!-- No text but there are blocks, so use the first one -->
+          <xsl:apply-templates select="*[1]">
+            <xsl:with-param name="questionNumber" select="$questionNumber" as="node()*"/>
+          </xsl:apply-templates>
+        </xsl:when>
+        <xsl:otherwise>
+          <!-- There is text before the first block or there is only text, put it in a paragraph along
+               with the question number.
+            -->
+          <p>
+             <xsl:call-template name="commonattributes"/>
+             <xsl:call-template name="setid"/>
+            <xsl:sequence select="$questionNumber"/>
+            <xsl:apply-templates select="$textBeforeBlocks"/>
+          </p>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="remainingBlocks" as="node()*">
+      <xsl:choose>
+        <xsl:when test="$hasTextBeforeBlocks">
+          <xsl:apply-templates select="node() except($textBeforeBlocks)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:apply-templates select="*[position() > 1]"/>
+        </xsl:otherwise>
+      </xsl:choose>      
+    </xsl:variable>
+    <div>
+      <xsl:call-template name="lc-setClassAtt">
+        <xsl:with-param name="baseClass" select="'lc-question-wrapper'" as="xs:string*"/>
+      </xsl:call-template>
+      <xsl:sequence select="$firstPara"/>
+      <xsl:sequence select="$remainingBlocks"/>
     </div>
+  </xsl:template>
+  
+  <xsl:template match="*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')]/*[contains(@class, ' topic/p ')]">
+    <xsl:param name="questionNumber" as="node()*"/>
+    <!-- Outputs the question number if it's been specified. Used for the first paragraph within a question. -->
+    <p>
+      <xsl:call-template name="commonattributes"/>
+      <xsl:call-template name="setid"/>
+      <xsl:sequence select="$questionNumber"/>
+      <xsl:apply-templates/>
+    </p>
   </xsl:template>
   
   <xsl:template match="*[contains(@class, ' learning2-d/lcFeedback2 ')] |
                        *[contains(@class, ' learning-d/lcFeedback ')]">
-    <xsl:message> + [DEBUG] lcFeedback: lc-show-feedback=<xsl:value-of select="$lc-show-feedback"/>"</xsl:message>
-    <xsl:message> + [DEBUG] lcFeedback: lc:doShowFeedback=<xsl:value-of select="$lc:doShowFeedback"/>"</xsl:message>
     <xsl:if test="$lc:doShowFeedback">
       <div>
         <xsl:call-template name="lc-setClassAtt">
@@ -305,6 +389,41 @@
    <xsl:sequence select="$baseType"/>
   </xsl:function>
  
+  <xsl:function name="lc:hasBlockChildren" as="xs:boolean">
+    <xsl:param name="context" as="element()"/>
+    <xsl:sequence select="boolean($context[
+      *[contains(@class, ' topic/p ')] |
+      *[contains(@class, ' topic/ol ')] |
+      *[contains(@class, ' topic/ul ')] |
+      *[contains(@class, ' topic/sl ')] |
+      *[contains(@class, ' topic/example ')] |
+      *[contains(@class, ' topic/fig ')] |
+      *[contains(@class, ' topic/figgroup ')] |
+      *[contains(@class, ' topic/lines ')] |
+      *[contains(@class, ' topic/note ')] |
+      *[contains(@class, ' topic/pre ')] |
+      *[contains(@class, ' topic/simpletable ')] |
+      *[contains(@class, ' topic/table')]
+      ])"/>
+  </xsl:function>
+  
+  <xsl:function name="lc:isBlock" as="xs:boolean">
+    <xsl:param name="context" as="element()"/>
+    <xsl:variable name="result" as="xs:boolean">
+      <xsl:choose>
+          <xsl:when test="contains($context/@class, ' topic/')">
+            <xsl:variable name="baseType"
+              select="substring-after(tokenize($context/@class, ' ')[2], '/')"
+            />
+            <xsl:sequence select="$baseType = $baseBlockTypes"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:sequence select="false()"/>
+          </xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>  
+    <xsl:sequence select="$result"/>
+  </xsl:function>
        
   <xsl:template name="lc-setClassAtt">
     <xsl:param name="baseClass" select="''" as="xs:string*"/>
@@ -320,9 +439,6 @@
          cannot be implemented using XSLT alone.
       -->
     <xsl:param name="numberFormat" as="xs:string" select="$lc-question-number-format"/>
-    <xsl:message> + [DEBUG] lcGetQuestionNumber: $lc-number-questions=<xsl:value-of select="$lc-number-questions"/></xsl:message>
-    <xsl:message> + [DEBUG] lcGetQuestionNumber: $lc:doNumberQuestions=<xsl:value-of select="$lc:doNumberQuestions"/></xsl:message>
-    <xsl:message> + [DEBUG] lcGetQuestionNumber: not($lc:doNumberQuestions)=<xsl:value-of select="not($lc:doNumberQuestions)"/></xsl:message>
     <xsl:variable name="questionNumber" as="xs:string">
       <xsl:choose>
         <xsl:when test="not($lc:doNumberQuestions)">

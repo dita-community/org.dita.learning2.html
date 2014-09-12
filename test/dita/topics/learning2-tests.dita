@@ -9,7 +9,7 @@
     </section>
     <section> <title>Interactions with no answers or feedback</title> <p>These interactions have no answers or feedback. They reflect the simplest use of the markup.</p> <lcOpenQuestion2
       id="lcOpenQuestion_kgx_1wc_jp">
-      <lcQuestion2>This is an open question interaction: The struggle of class against class is what kind of struggle? Explain your answer.</lcQuestion2>
+      <lcQuestion2>This is text within lcQuestion2 but before first paragraph. <p>The struggle of class against class is what kind of struggle? </p><p>Explain your answer.</p></lcQuestion2>
       </lcOpenQuestion2> <lcSingleSelect2 id="lcSingleSelect_tq4_bxc_jp">
       <lcQuestion2>Single select: Choose the correct answer:</lcQuestion2>
       <lcAnswerOptionGroup2>
