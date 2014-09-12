@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE learningAssessment PUBLIC "-//OASIS//DTD DITA Learning Assessment//EN" "learningAssessment.dtd">
+<learningAssessment id="assessment_agl_qdd_jp">
+ <title>Learning 2 Barbri Questions</title>
+ <shortdesc>Real questions from Barbri</shortdesc>
+  <learningAssessmentbody>
+    <section>
+      <title>From MSE14</title>
+<lcSingleSelect2>
+      <lcInteractionLabel2> <b>
+Question 1
+</b> </lcInteractionLabel2>
+      <lcQuestion2>
+        <p>
+Federal narcotics officers suspected the defendant of growing marijuana in his greenhouse, which was connected to his house. The narcotics officers learned from an anonymous informant that the semi-opaque panes of glass on the greenhouse were being replaced during the night with a newer type of glass that let in more light without an increase in visibility. Without a warrant, the officers flew over the defendant's greenhouse in a helicopter that night. One of the officers focused on the greenhouse with a pair of "night vision" thermal imaging binoculars supplied by the Department of Defense and not available to the general public. He determined that marijuana was being grown. The officers then went to a magistrate, swore out a warrant, and arrested the defendant.
+</p>
+        <p>
+If the defendant moves to suppress any evidence gathered by virtue of the flyover, the motion most likely will be:
+</p> </lcQuestion2>
+      <lcAnswerOptionGroup2>
+        <lcAnswerOption2>
+          <lcAnswerContent2>
+Denied, because the police may conduct flyovers to gather evidence.
+</lcAnswerContent2>
+        </lcAnswerOption2>
+        <lcAnswerOption2>
+          <lcAnswerContent2>
+Denied, because the defendant did not live in the greenhouse.
+</lcAnswerContent2>
+        </lcAnswerOption2>
+        <lcAnswerOption2>
+          <lcAnswerContent2>
+Granted, because the "night-vision" binoculars were not available to the general public.
+</lcAnswerContent2>
+          <lcCorrectResponse2 name="lcCorrectResponse2" value="lcCorrectResponse2"/>
+          <lcFeedback2> <data name="Category">
+Criminal Law &amp; Procedure
+</data> <data name="Sub-category">
+search and seizure
+</data>
+            <p>
+The use of thermal imaging binoculars to observe the marijuana where it could not be observed by simply using the naked eye likely renders the search invalid. To be able to assert a Fourth Amendment right, a person must have a reasonable expectation of privacy with respect to the place searched or the item seized. There is no such expectation of privacy in objects or places held out to the public or that may be viewed from a public vantage point. Thus, the police may fly over an area to observe it with the naked eye, and even a low flyover by a helicopter to view inside a partially covered building is permissible. This is true even if the area is within the curtilage. However, the police may not use technologically enhanced methods that are not available to the public to search areas (at least as to areas within the curtilage). In the instant case, the police have flown over the defendant's greenhouse at night and used a means of enhancing their vision that is not available to the general public. This enabled them to see what could not have been observed with the naked eye, which likely constitutes an impermissible search. [
+<i>
+See
+</i>
+ Kyllo v. United States (2001)] (A) is incorrect because it is too broad a statement. The police generally may look into any area, even an area within the home or curtilage, by means of a flyover, so long as they do so from a place the public has access to; 
+<b>
+            <i>
+however, the police may not use technological enhancements that are not available to the public
+</i>
+            </b>
+. In the instant case, the use of thermal imaging makes the police conduct unconstitutional. (B) is incorrect, as it does not properly define the concept of "open fields." Under the "open fields" doctrine, areas outside the "curtilage" (dwelling house 
+<b>
+            <i>
+and outbuildings
+</i>
+            </b>
+) are subject to police search, as these areas are held out to the public and are unprotected by the Fourth Amendment. (B) ignores the fact that an outbuilding may be deemed part of the curtilage. (In determining whether the building is part of the curtilage, the court will consider the proximity of the building to the dwelling, whether the area is enclosed in the same area as the dwelling, and the steps taken by the resident to protect the building from the view of passersby.) (D) is incorrect because it is irrelevant. The officers are not using the informant to establish probable cause for a search warrant. If the flyover had otherwise been permissible, the fact that it was prompted by an anonymous informant would not matter.
+</p>
+          </lcFeedback2>
+        </lcAnswerOption2>
+        <lcAnswerOption2>
+          <lcAnswerContent2>
+Granted, because the flyover was prompted by a tip from an anonymous informant.
+</lcAnswerContent2>
+        </lcAnswerOption2>
+      </lcAnswerOptionGroup2>
+    </lcSingleSelect2>      
+    </section>
+  </learningAssessmentbody>
+</learningAssessment>

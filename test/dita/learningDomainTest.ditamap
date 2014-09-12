@@ -3,6 +3,7 @@
 <map title="DITA Topic Learning Map">
   <title>Learning Domain Test</title>
   <topicref href="topics/learningDomainTest.dita" chunk="to-content select-branch">
+    <topicref href="topics/learning2-barbri-questions.dita"/>
     <topicref href="topics/learning1-tests.dita"/>
     <topicref href="topics/learning2-tests.dita"/>
   </topicref>
