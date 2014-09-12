@@ -50,7 +50,9 @@
          
    -->
   <xsl:param name="lc-number-questions" as="xs:string" select="'true'"/>
-  <xsl:variable name="lcNumberQuestions"></xsl:variable>
+  <xsl:variable name="lc:doNumberQuestions" as="xs:boolean" 
+    select="matches($lc-number-questions, '1|yes|true|on', 'i')"
+  />
   
   <!-- Default format string to use for generating question numbers. This
        value will be used by the xsl:number @format attribute.
@@ -272,7 +274,7 @@
     <xsl:param name="numberFormat" as="xs:string" select="$lc-question-number-format"/>
     <xsl:variable name="questionNumber" as="xs:string">
       <xsl:choose>
-        <xsl:when test="matches($lc-number-questions, 'no|false|off|0', 'i')">
+        <xsl:when test="not($lc:doNumberQuestions)">
           <xsl:sequence select="''"/>
         </xsl:when>
         <xsl:otherwise>
