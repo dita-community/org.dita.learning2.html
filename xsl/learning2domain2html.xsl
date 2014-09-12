@@ -234,19 +234,30 @@
   
   <xsl:template name="constructInteractionWithAnswerOptionGroup">
     <xsl:param name="baseClass" as="xs:string*" select="lc:getBaseLcTypeForElement(.)"/>
+    <div class="lc-interaction-wrapper">
+      <xsl:apply-templates 
+          select="*[contains(@class, ' learningInteractionBase2-d/lcInteractionLabel2 ')]"/>
+      <p>
+        <xsl:call-template name="commonattributes"/>
+        <xsl:call-template name="lc-setClassAtt">
+          <xsl:with-param name="baseClass" select="$baseClass" as="xs:string*"/>
+        </xsl:call-template>
+        <xsl:apply-templates 
+          select="*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')] |
+                  *[contains(@class, ' learningInteractionBase-d/lcQuestionBase ')]"
+        />
+        <xsl:apply-templates 
+          select="*[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')] |
+                  *[contains(@class, ' learning-d/lcAnswerOptionGroup ')]"
+        />
+      </p>
+    </div>
+  </xsl:template>
+  
+  <xsl:template match="*[contains(@class, ' learningInteractionBase2-d/lcInteractionLabel2 ')]">
     <p>
       <xsl:call-template name="commonattributes"/>
-      <xsl:call-template name="lc-setClassAtt">
-        <xsl:with-param name="baseClass" select="$baseClass" as="xs:string*"/>
-      </xsl:call-template>
-      <xsl:apply-templates 
-        select="*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')] |
-                *[contains(@class, ' learningInteractionBase-d/lcQuestionBase ')]"
-      />
-      <xsl:apply-templates 
-        select="*[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')] |
-                *[contains(@class, ' learning-d/lcAnswerOptionGroup ')]"
-      />
+      <xsl:apply-templates/>
     </p>
   </xsl:template>
 
@@ -266,6 +277,8 @@
   
   <xsl:template match="*[contains(@class, ' learning2-d/lcFeedback2 ')] |
                        *[contains(@class, ' learning-d/lcFeedback ')]">
+    <xsl:message> + [DEBUG] lcFeedback: lc-show-feedback=<xsl:value-of select="$lc-show-feedback"/>"</xsl:message>
+    <xsl:message> + [DEBUG] lcFeedback: lc:doShowFeedback=<xsl:value-of select="$lc:doShowFeedback"/>"</xsl:message>
     <xsl:if test="$lc:doShowFeedback">
       <div>
         <xsl:call-template name="lc-setClassAtt">
