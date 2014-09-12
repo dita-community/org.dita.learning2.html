@@ -87,6 +87,22 @@
   -->
   <xsl:param name="lc-answer-option-number-format" as="xs:string" select="'A.'"/>
   
+  <!-- Display only the question label and number (if numbered) and any 
+       correct answers. Display of feedback is controlled through the
+       separate lc-show-feedback parameter.
+              
+       Default is "no" (show whole question)
+       
+       NOTE: This option would only be used globally when producing
+       a standalone answer-key publication. The corresponding 
+       template-level parameter can be used from custom code
+       to control this behavior dynamically within a single publication.
+  -->
+  <xsl:param name="lc-show-only-correct-answer" as="xs:string" select="'no'"/>
+  <xsl:variable name="lc:doShowOnlyCorrectAnswer" as="xs:boolean"
+    select="matches($lc-show-only-correct-answer, '1|yes|true|on', 'i')"
+  />
+  
   <xsl:variable name="baseBlockTypes" as="xs:string*"
      select="('dl',
               'fig',
@@ -160,22 +176,51 @@
    
   <xsl:template match="*[contains(@class, ' learning2-d/lcAnswerOption2 ')] |
                        *[contains(@class, ' learning-d/lcAnswerOption ')]">
+    <xsl:param name="lc:showOnlyCorrectAnswer" as="xs:boolean" tunnel="yes"
+      select="$lc:doShowOnlyCorrectAnswer"
+    />
+    
     <xsl:variable name="isCorrectAnswer" as="xs:boolean"
       select="boolean(./*[contains(@class, ' learning2-d/lcCorrectResponse2 ')] |
                        *[contains(@class, ' learning-d/lcCorrectResponse ')])"
     />
-    <li>
-      <xsl:call-template name="lc-setClassAtt">
-        <xsl:with-param name="baseClass" 
-          as="xs:string*"
-          select="'lcAnswerOption', if ($isCorrectAnswer) then 'lc-correct-response' else ''" 
-        />
-      </xsl:call-template>
-<!--      <xsl:apply-templates select="." mode="lc-set-answer-option-label"/>-->
-      <div class="lc-answer-option-content">
-        <xsl:apply-templates/>
-      </div>
-    </li>
+    <xsl:choose>
+      <xsl:when test="($lc:showOnlyCorrectAnswer and not($isCorrectAnswer))">
+        <!-- Do nothing: incorrect answers are suppressed -->
+      </xsl:when>
+      <xsl:when test="($lc:showOnlyCorrectAnswer and $isCorrectAnswer)">
+        <!-- When we're only showing the correct answers, we have to generate
+             the answer option label.
+          -->
+        <xsl:message> + [DEBUG] doShowOnlyCorrectAnswer=true, isCorrectAnswer.</xsl:message>
+        <div>
+          <xsl:call-template name="lc-setClassAtt">
+            <xsl:with-param name="baseClass" 
+              as="xs:string*"
+              select="'lcAnswerOption', if ($isCorrectAnswer) then 'lc-correct-response' else ''" 
+            />
+          </xsl:call-template>
+          <xsl:apply-templates select="." mode="lc-set-answer-option-label"/>
+          <span class="lc-answer-option-content">
+            <xsl:apply-templates/>
+          </span>
+        </div>
+      </xsl:when>
+      <xsl:otherwise>
+        <li>
+          <xsl:call-template name="lc-setClassAtt">
+            <xsl:with-param name="baseClass" 
+              as="xs:string*"
+              select="'lcAnswerOption', if ($isCorrectAnswer) then 'lc-correct-response' else ''" 
+            />
+          </xsl:call-template>
+    <!--      <xsl:apply-templates select="." mode="lc-set-answer-option-label"/>-->
+          <div class="lc-answer-option-content">
+            <xsl:apply-templates/>
+          </div>
+        </li>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
   
   <xsl:template mode="lc-set-answer-option-label" 
@@ -253,6 +298,9 @@
   
   <xsl:template name="constructInteractionWithAnswerOptionGroup">
     <xsl:param name="baseClass" as="xs:string*" select="lc:getBaseLcTypeForElement(.)"/>
+    <xsl:param name="lc:showOnlyCorrectAnswer" as="xs:boolean" tunnel="yes"
+      select="$lc:doShowOnlyCorrectAnswer"
+    />
     <xsl:variable name="interactionContents" as="node()*">
     </xsl:variable>
     <div class="lc-interaction-wrapper">
@@ -262,10 +310,12 @@
       </xsl:call-template>
       <xsl:apply-templates 
           select="*[contains(@class, ' learningInteractionBase2-d/lcInteractionLabel2 ')]"/>
-      <xsl:apply-templates 
-        select="*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')] |
-                *[contains(@class, ' learningInteractionBase-d/lcQuestionBase ')]"
-      />
+      <xsl:if test="not($lc:showOnlyCorrectAnswer)">
+        <xsl:apply-templates 
+          select="*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')] |
+                  *[contains(@class, ' learningInteractionBase-d/lcQuestionBase ')]"
+        />
+      </xsl:if>
       <xsl:apply-templates 
         select="*[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')] |
                 *[contains(@class, ' learning-d/lcAnswerOptionGroup ')]"
@@ -359,6 +409,20 @@
       <xsl:sequence select="$questionNumber"/>
       <xsl:apply-templates/>
     </p>
+  </xsl:template>
+  
+  <xsl:template match="*[contains(@class, ' learning-d/lcAnswerContent ')]">
+    <span>
+      <xsl:call-template name="lc-setClassAtt"/>
+      <xsl:apply-templates/>
+    </span>
+  </xsl:template>
+  
+  <xsl:template match="*[contains(@class, ' learning2-d/lcAnswerContent2 ')]">
+    <span>
+      <xsl:call-template name="lc-setClassAtt"/>
+      <xsl:apply-templates/>
+    </span>
   </xsl:template>
   
   <xsl:template match="*[contains(@class, ' learning2-d/lcFeedback2 ')] |
