@@ -54,7 +54,23 @@
     select="matches($lc-number-questions, '1|yes|true|on', 'i')"
   />
   
-  <!-- Default format string to use for generating question numbers. This
+  <!-- When set on, show feedback for answer options and entire questions
+       in the output.  Default is "false" (suppress feedback).
+    -->
+  <xsl:param name="lc-show-feedback" as="xs:string" select="'false'"/>
+  <xsl:variable name="lc:doShowFeedback" as="xs:boolean" 
+    select="matches($lc-show-feedback, '1|yes|true|on', 'i')"
+  />
+  
+  <!-- When set on, adds a class value to correct answer options to allow highlighting
+       them using CSS. Default is "true"
+    -->
+  <xsl:param name="lc-style-correct-responses" as="xs:string" select="'true'"/>
+  <xsl:variable name="lc:doStyleCorrectResponses" as="xs:boolean" 
+    select="matches($lc-style-correct-responses, '1|yes|true|on', 'i')"
+  />
+  
+  <!-- Default format string to use fordoShow generating question numbers. This
        value will be used by the xsl:number @format attribute.
     -->
   <xsl:param name="lc-question-number-format" as="xs:string" select="'1.'"/>
@@ -116,7 +132,7 @@
                        *[contains(@class, ' learning-d/lcAnswerOptionGroup ')]">
     <ol>
       <xsl:call-template name="lc-setClassAtt">
-        <xsl:with-param name="baseClass" select="'lcAnswerOptionGroup'" as="xs:string"/>
+        <xsl:with-param name="baseClass" select="'lcAnswerOptionGroup'" as="xs:string*"/>
       </xsl:call-template>
       <xsl:apply-templates/>
     </ol>
@@ -125,9 +141,16 @@
    
   <xsl:template match="*[contains(@class, ' learning2-d/lcAnswerOption2 ')] |
                        *[contains(@class, ' learning-d/lcAnswerOption ')]">
+    <xsl:variable name="isCorrectAnswer" as="xs:boolean"
+      select="boolean(./*[contains(@class, ' learning2-d/lcCorrectResponse2 ')] |
+                       *[contains(@class, ' learning-d/lcCorrectResponse ')])"
+    />
     <li>
       <xsl:call-template name="lc-setClassAtt">
-        <xsl:with-param name="baseClass" select="'lcAnswerOption'" as="xs:string"/>
+        <xsl:with-param name="baseClass" 
+          as="xs:string*"
+          select="'lcAnswerOption', if ($isCorrectAnswer) then 'lc-correct-response' else ''" 
+        />
       </xsl:call-template>
       <xsl:apply-templates select="." mode="lc-set-answer-option-label"/>
       <div class="lc-answer-option-content">
@@ -210,11 +233,11 @@
        ==================================================== -->
   
   <xsl:template name="constructInteractionWithAnswerOptionGroup">
-    <xsl:param name="baseClass" as="xs:string" select="lc:getBaseLcTypeForElement(.)"/>
+    <xsl:param name="baseClass" as="xs:string*" select="lc:getBaseLcTypeForElement(.)"/>
     <p>
       <xsl:call-template name="commonattributes"/>
       <xsl:call-template name="lc-setClassAtt">
-        <xsl:with-param name="baseClass" select="$baseClass" as="xs:string"/>
+        <xsl:with-param name="baseClass" select="$baseClass" as="xs:string*"/>
       </xsl:call-template>
       <xsl:apply-templates 
         select="*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')] |
@@ -234,11 +257,23 @@
     />
     <div>
       <xsl:call-template name="lc-setClassAtt">
-        <xsl:with-param name="baseClass" select="$baseClass" as="xs:string"/>
+        <xsl:with-param name="baseClass" select="$baseClass" as="xs:string*"/>
       </xsl:call-template>
       <xsl:call-template name="lcGetQuestionNumber"/>
       <span class="lcQuestionText"><xsl:apply-templates/></span>
     </div>
+  </xsl:template>
+  
+  <xsl:template match="*[contains(@class, ' learning2-d/lcFeedback2 ')] |
+                       *[contains(@class, ' learning-d/lcFeedback ')]">
+    <xsl:if test="$lc:doShowFeedback">
+      <div>
+        <xsl:call-template name="lc-setClassAtt">
+          <xsl:with-param name="baseClass" select="lc:getBaseLcTypeForElement(.)" as="xs:string*"/>
+        </xsl:call-template>
+        <xsl:apply-templates/>
+      </div>
+    </xsl:if>
   </xsl:template>
   
   <xsl:function name="lc:getBaseLcTypeForElement" as="xs:string">
@@ -259,7 +294,7 @@
  
        
   <xsl:template name="lc-setClassAtt">
-    <xsl:param name="baseClass" select="''" as="xs:string"/>
+    <xsl:param name="baseClass" select="''" as="xs:string*"/>
     <xsl:variable name="classAtt" as="attribute()">
       <xsl:apply-templates select="." mode="set-output-class"/>      
     </xsl:variable>
@@ -272,6 +307,9 @@
          cannot be implemented using XSLT alone.
       -->
     <xsl:param name="numberFormat" as="xs:string" select="$lc-question-number-format"/>
+    <xsl:message> + [DEBUG] lcGetQuestionNumber: $lc-number-questions=<xsl:value-of select="$lc-number-questions"/></xsl:message>
+    <xsl:message> + [DEBUG] lcGetQuestionNumber: $lc:doNumberQuestions=<xsl:value-of select="$lc:doNumberQuestions"/></xsl:message>
+    <xsl:message> + [DEBUG] lcGetQuestionNumber: not($lc:doNumberQuestions)=<xsl:value-of select="not($lc:doNumberQuestions)"/></xsl:message>
     <xsl:variable name="questionNumber" as="xs:string">
       <xsl:choose>
         <xsl:when test="not($lc:doNumberQuestions)">

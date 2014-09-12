@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension>
+   <param name="lc-number-questions" expression="${lc-number-questions}" if="out.ext" />
+</extension>

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension>
+  <param name="lc-number-questions" expression="${arg.lc.html.numberQuestions}" if="arg.lc.html.numberQuestions"/>
+</extension>
