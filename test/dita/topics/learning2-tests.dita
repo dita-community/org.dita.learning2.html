@@ -27,7 +27,8 @@
           <lcCorrectResponse2/>
         </lcAnswerOption2>
       </lcAnswerOptionGroup2>
-      </lcSingleSelect2> <lcMultipleSelect2 id="lcMultipleSelect_acs_jxc_jp">
+      </lcSingleSelect2> 
+      <lcMultipleSelect2 id="lcMultipleSelect_acs_jxc_jp">
       <lcQuestion2>This is a multi-select: Choose all that apply:</lcQuestion2>
       <lcAnswerOptionGroup2 id="lcAnswerOptionGroup2_mcs_jxc_jp">
         <lcAnswerOption2>

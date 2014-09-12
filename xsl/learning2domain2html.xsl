@@ -2,7 +2,8 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl"
-  exclude-result-prefixes="xs xd"
+  xmlns:lc="urn:function:learningContent"
+  exclude-result-prefixes="xs xd lc"
   version="2.0">
   <!-- ========================================================
         Learning Domain (questions and answers) HTML generation.
@@ -75,36 +76,9 @@
        ===================== -->
   
   <xsl:template match="*[contains(@class, ' learning2-d/lcTrueFalse2 ')]">
-    <div class="lcTrueFalse {name(.)}">
-      <xsl:call-template name="commonattributes"/>
-      <xsl:call-template name="lc-setClassAtt">
-        <xsl:with-param name="baseClass" select="'lcTrueFalse'" as="xs:string"/>
-      </xsl:call-template>
-      <xsl:apply-templates 
-        select="*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')]"
-      />
-      <xsl:apply-templates 
-        select="*[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')]"
-      />
-    </div>
+    <xsl:call-template name="constructInteractionWithAnswerOptionGroup"/>    
   </xsl:template>
-  
-  <xsl:template match="*[contains(@class, ' learning2-d/lcTrueFalse2 ')]/*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')]">
-    <div>
-      <xsl:call-template name="lc-setClassAtt">
-        <xsl:with-param name="baseClass" select="'lcTrueFalseQuestion'" as="xs:string"/>
-      </xsl:call-template>
-      <xsl:call-template name="lcGetQuestionNumber"/>
-      <span class="lcQuestionText"><xsl:apply-templates/></span>
-    </div>
-  </xsl:template>
-  
-  <xsl:template match="*[contains(@class, ' learning2-d/lcTrueFalse2 ')]/*[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')]">
-    <div class="lcTrueFalseAnswers {name(.)} lcAnswerOptionGroup">
-      <xsl:apply-templates/>
-    </div>
-  </xsl:template>
-   
+    
    
   <!-- There are several different ways commonly used to present true/false questions:
     
@@ -127,39 +101,9 @@
        ===================== -->
   
   <xsl:template match="*[contains(@class, ' learning2-d/lcSingleSelect2 ')]">
-    <div>
-      <xsl:call-template name="commonattributes"/>
-      <xsl:call-template name="lc-setClassAtt">
-        <xsl:with-param name="baseClass" select="'lcSingleSelect'" as="xs:string"/>
-      </xsl:call-template>
-      <xsl:apply-templates 
-        select="*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')]"
-      />
-      <xsl:apply-templates 
-        select="*[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')]"
-      />
-    </div>
+    <xsl:call-template name="constructInteractionWithAnswerOptionGroup"/>    
   </xsl:template>
   
-  <xsl:template match="*[contains(@class, ' learning2-d/lcSingleSelect2 ')]/*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')]">
-    <div>
-      <xsl:call-template name="lc-setClassAtt">
-        <xsl:with-param name="baseClass" select="'lcSingleSelectQuestion'" as="xs:string"/>
-      </xsl:call-template>
-      <xsl:call-template name="lcGetQuestionNumber"/>
-      <span class="lcQuestionText"><xsl:apply-templates/></span>
-    </div>
-  </xsl:template>
-  
-  <xsl:template match="*[contains(@class, ' learning2-d/lcSingleSelect2 ')]/*[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')]" priority="10">
-    <ol>
-      <xsl:call-template name="lc-setClassAtt">
-        <xsl:with-param name="baseClass" select="'lcSingleSelectAnswers lcAnswerOptionGroup'" as="xs:string"/>
-      </xsl:call-template>
-      <xsl:apply-templates/>
-    </ol>
-  </xsl:template>
-   
   <!-- =====================
        Answer Option Group
        ===================== -->
@@ -200,9 +144,9 @@
        ===================== -->
   
   <xsl:template match="*[contains(@class, ' learning2-d/lcMultipleSelect2 ')]">
-    <xsl:next-match/>
+    <xsl:call-template name="constructInteractionWithAnswerOptionGroup"/>    
   </xsl:template>
-  
+
   <!-- =====================
        Sequencing
        ===================== -->
@@ -228,9 +172,9 @@
   <!-- =====================
        Open question
        ===================== -->
-  <xsl:template match="*[contains(@class, ' learning2-d/lcOpenQuestion2 ')]">
-    <xsl:message> + [DEBUG] learning2-d/lcOpenQuestion2</xsl:message>
-    <xsl:next-match/>
+  <xsl:template match="*[contains(@class, ' learning2-d/lcOpenQuestion2 ')] |
+                       *[contains(@class, ' learning-d/lcOpenQuestion ')]">
+    <xsl:call-template name="constructInteractionWithAnswerOptionGroup"/>    
   </xsl:template>
   
   <!-- =====================
@@ -250,6 +194,52 @@
   <!-- ====================================================
        General interaction support templates and functions.
        ==================================================== -->
+  
+  <xsl:template name="constructInteractionWithAnswerOptionGroup">
+    <xsl:param name="baseClass" as="xs:string" select="lc:getBaseLcTypeForElement(.)"/>
+    <p>
+      <xsl:call-template name="commonattributes"/>
+      <xsl:call-template name="lc-setClassAtt">
+        <xsl:with-param name="baseClass" select="$baseClass" as="xs:string"/>
+      </xsl:call-template>
+      <xsl:apply-templates 
+        select="*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')]"
+      />
+      <xsl:apply-templates 
+        select="*[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')]"
+      />
+    </p>
+  </xsl:template>
+
+  <xsl:template match="*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')]">
+    <xsl:variable name="baseClass" as="xs:string"
+      select="concat(lc:getBaseLcTypeForElement(..), 'Question')"
+    />
+    <div>
+      <xsl:call-template name="lc-setClassAtt">
+        <xsl:with-param name="baseClass" select="$baseClass" as="xs:string"/>
+      </xsl:call-template>
+      <xsl:call-template name="lcGetQuestionNumber"/>
+      <span class="lcQuestionText"><xsl:apply-templates/></span>
+    </div>
+  </xsl:template>
+  
+  <xsl:function name="lc:getBaseLcTypeForElement" as="xs:string">
+    <xsl:param name="elem" as="element()"/>
+    
+    <!-- + topic/div learningInteractionBase2-d/lcInteractionBase2 learning2-d/lcMultipleSelect2  -->
+
+    <xsl:variable name="lcType" as="xs:string"
+      select="tokenize(tokenize($elem/@class, ' ')[4], '/')[2]"
+    />
+    <xsl:variable name="baseType" as="xs:string"
+      select="if (contains($lcType, '2')) 
+                 then substring-before($lcType, '2')
+                 else $lcType"
+    />
+   <xsl:sequence select="$baseType"/>
+  </xsl:function>
+ 
        
   <xsl:template name="lc-setClassAtt">
     <xsl:param name="baseClass" select="''" as="xs:string"/>

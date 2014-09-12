@@ -4,6 +4,10 @@
  
  @import url(commonltr.css);
  
+ .lcQuestionNumber {
+   font-weight: bold;
+ }
+ 
  .lcAnswerOptionGroup {
    list-style: upper-alpha;
  }
@@ -19,5 +23,7 @@
  .lc-answer-option-content {
    display: inline;
  }
+ 
+
  
  
