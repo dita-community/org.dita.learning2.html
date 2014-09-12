@@ -1,0 +1,23 @@
+/**
+ * CSS for Learning and Training interactions (assessment questions and answers) 
+ */ 
+ 
+ @import url(commonltr.css);
+ 
+ .lcAnswerOptionGroup {
+   list-style: upper-alpha;
+ }
+
+.lcAnswerOption {
+  display: list-item;  
+}
+
+ .lc-answer-option-label {
+   display: none;
+ }
+ 
+ .lc-answer-option-content {
+   display: inline;
+ }
+ 
+ 

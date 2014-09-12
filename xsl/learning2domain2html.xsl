@@ -55,10 +55,18 @@
        value will be used by the xsl:number @format attribute.
     -->
   <xsl:param name="lc-question-number-format" as="xs:string" select="'1.'"/>
+
   <!-- Static prefix to put before question numbers. Default is "Q ". -->
   <xsl:param name="lc-question-number-prefix" as="xs:string" select="'Q '"/>
+
   <!-- Static suffix to put after question numbers. Default is " " (Single space). -->
   <xsl:param name="lc-question-number-suffix" as="xs:string" select="' '"/>
+  
+  <!-- Number format specification for answers options within an answer option group.
+       
+       Default is to number from A to D.
+  -->
+  <xsl:param name="lc-answer-option-number-format" as="xs:string" select="'A.'"/>
   
   <xsl:include href="plugin:org.dita.dita13base.html:xsl/dita13base2html.xsl"/>
   
@@ -143,16 +151,50 @@
     </div>
   </xsl:template>
   
-  <xsl:template match="*[contains(@class, ' learning2-d/lcSingleSelect2 ')]/*[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')]">
-    <div>
+  <xsl:template match="*[contains(@class, ' learning2-d/lcSingleSelect2 ')]/*[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')]" priority="10">
+    <ol>
       <xsl:call-template name="lc-setClassAtt">
         <xsl:with-param name="baseClass" select="'lcSingleSelectAnswers lcAnswerOptionGroup'" as="xs:string"/>
       </xsl:call-template>
       <xsl:apply-templates/>
-    </div>
+    </ol>
   </xsl:template>
    
+  <!-- =====================
+       Answer Option Group
+       ===================== -->
   
+  <xsl:template match="*[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')]">
+    <ol>
+      <xsl:call-template name="lc-setClassAtt">
+        <xsl:with-param name="baseClass" select="'lcAnswerOptionGroup'" as="xs:string"/>
+      </xsl:call-template>
+      <xsl:apply-templates/>
+    </ol>
+  </xsl:template>
+
+   
+  <xsl:template match="*[contains(@class, ' learning2-d/lcAnswerOption2 ')]">
+    <li>
+      <xsl:call-template name="lc-setClassAtt">
+        <xsl:with-param name="baseClass" select="'lcAnswerOption'" as="xs:string"/>
+      </xsl:call-template>
+      <xsl:apply-templates select="." mode="lc-set-answer-option-label"/>
+      <div class="lc-answer-option-content">
+        <xsl:apply-templates/>
+      </div>
+    </li>
+  </xsl:template>
+  
+  <xsl:template mode="lc-set-answer-option-label" match="*[contains(@class, ' learning2-d/lcAnswerOption2 ')]">
+      <span class="lc-answer-option-label">
+        <xsl:number count="*[contains(@class, ' learning2-d/lcAnswerOption2 ')]"
+          format="{$lc-answer-option-number-format}"
+          from="*[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')]"
+        /><xsl:text>&#xa0;</xsl:text>
+      </span>
+  </xsl:template>
+
   <!-- =====================
        Multiple Select
        ===================== -->
