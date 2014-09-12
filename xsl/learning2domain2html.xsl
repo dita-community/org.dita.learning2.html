@@ -75,7 +75,8 @@
        True/False
        ===================== -->
   
-  <xsl:template match="*[contains(@class, ' learning2-d/lcTrueFalse2 ')]">
+  <xsl:template match="*[contains(@class, ' learning2-d/lcTrueFalse2 ')] |
+                       *[contains(@class, ' learning-d/lcTrueFalse ')]">
     <xsl:call-template name="constructInteractionWithAnswerOptionGroup"/>    
   </xsl:template>
     
@@ -100,7 +101,8 @@
        Single Select
        ===================== -->
   
-  <xsl:template match="*[contains(@class, ' learning2-d/lcSingleSelect2 ')]">
+  <xsl:template match="*[contains(@class, ' learning2-d/lcSingleSelect2 ')] |
+                       *[contains(@class, ' learning-d/lcSingleSelect ')]">
     <xsl:call-template name="constructInteractionWithAnswerOptionGroup"/>    
   </xsl:template>
   
@@ -108,7 +110,8 @@
        Answer Option Group
        ===================== -->
   
-  <xsl:template match="*[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')]">
+  <xsl:template match="*[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')] |
+                       *[contains(@class, ' learning-d/lcAnswerOptionGroup ')]">
     <ol>
       <xsl:call-template name="lc-setClassAtt">
         <xsl:with-param name="baseClass" select="'lcAnswerOptionGroup'" as="xs:string"/>
@@ -118,7 +121,8 @@
   </xsl:template>
 
    
-  <xsl:template match="*[contains(@class, ' learning2-d/lcAnswerOption2 ')]">
+  <xsl:template match="*[contains(@class, ' learning2-d/lcAnswerOption2 ')] |
+                       *[contains(@class, ' learning-d/lcAnswerOption ')]">
     <li>
       <xsl:call-template name="lc-setClassAtt">
         <xsl:with-param name="baseClass" select="'lcAnswerOption'" as="xs:string"/>
@@ -130,11 +134,15 @@
     </li>
   </xsl:template>
   
-  <xsl:template mode="lc-set-answer-option-label" match="*[contains(@class, ' learning2-d/lcAnswerOption2 ')]">
+  <xsl:template mode="lc-set-answer-option-label" 
+    match="*[contains(@class, ' learning2-d/lcAnswerOption2 ')] |
+           *[contains(@class, ' learning-d/lcAnswerOption ')]">
       <span class="lc-answer-option-label">
-        <xsl:number count="*[contains(@class, ' learning2-d/lcAnswerOption2 ')]"
+        <xsl:number count="*[contains(@class, ' learning2-d/lcAnswerOption2 ')] |
+                           *[contains(@class, ' learning-d/lcAnswerOption ')]"
           format="{$lc-answer-option-number-format}"
-          from="*[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')]"
+          from="*[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')] |
+                *[contains(@class, ' learning-d/lcAnswerOptionGroup ')]"
         /><xsl:text>&#xa0;</xsl:text>
       </span>
   </xsl:template>
@@ -143,7 +151,8 @@
        Multiple Select
        ===================== -->
   
-  <xsl:template match="*[contains(@class, ' learning2-d/lcMultipleSelect2 ')]">
+  <xsl:template match="*[contains(@class, ' learning2-d/lcMultipleSelect2 ')] | 
+                       *[contains(@class, ' learning-d/lcMultipleSelect ')]">
     <xsl:call-template name="constructInteractionWithAnswerOptionGroup"/>    
   </xsl:template>
 
@@ -151,21 +160,24 @@
        Sequencing
        ===================== -->
 
-  <xsl:template match="*[contains(@class, ' learning2-d/lcSequencing2 ')]">
-    <xsl:next-match/>
+  <xsl:template match="*[contains(@class, ' learning2-d/lcSequencing2 ')] |
+                       *[contains(@class, ' learning-d/lcSequencing ')]">
+    <xsl:call-template name="constructInteractionWithAnswerOptionGroup"/>
   </xsl:template>
   
   <!-- =====================
        Matching
        ===================== -->
-  <xsl:template match="*[contains(@class, ' learning2-d/lcMatching2 ')]">
+  <xsl:template match="*[contains(@class, ' learning2-d/lcMatching2 ')] |
+                       *[contains(@class, ' learning-d/lcMatching ')]">
     <xsl:next-match/>
   </xsl:template>
   
   <!-- =====================
        Hotspot
        ===================== -->
-  <xsl:template match="*[contains(@class, ' learning2-d/lcHotspot2 ')]">
+  <xsl:template match="*[contains(@class, ' learning2-d/lcHotspot2 ')] |
+                       *[contains(@class, ' learning-d/lcHotspot ')]">
     <xsl:next-match/>
   </xsl:template>
   
@@ -180,10 +192,10 @@
   <!-- =====================
        Fallback handling
        ===================== -->
-  <xsl:template match="*[contains(@class, ' learningInteractionBase2-d/lcInteractionBase2 ')]"
+  <xsl:template match="*[contains(@class, ' learningInteractionBase2-d/lcInteractionBase2 ')] |
+                       *[contains(@class, ' learningInteractionBase-d/lcInteractionBase ')]"
       priority="-0.5"
     >
-    <xsl:message> + [DEBUG] learningInteractionBase2-d/lcInteractionBase2: <xsl:value-of select="concat(name(..), '/', name(.))"/></xsl:message>
     <!-- Fallback handling for interactions -->
     <div>
       <xsl:call-template name="commonattributes"/>
@@ -203,15 +215,18 @@
         <xsl:with-param name="baseClass" select="$baseClass" as="xs:string"/>
       </xsl:call-template>
       <xsl:apply-templates 
-        select="*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')]"
+        select="*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')] |
+                *[contains(@class, ' learningInteractionBase-d/lcQuestionBase ')]"
       />
       <xsl:apply-templates 
-        select="*[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')]"
+        select="*[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')] |
+                *[contains(@class, ' learning-d/lcAnswerOptionGroup ')]"
       />
     </p>
   </xsl:template>
 
-  <xsl:template match="*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')]">
+  <xsl:template match="*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')] |
+                       *[contains(@class, ' learningInteractionBase-d/lcQuestionBase ')]">
     <xsl:variable name="baseClass" as="xs:string"
       select="concat(lc:getBaseLcTypeForElement(..), 'Question')"
     />
@@ -262,7 +277,8 @@
         </xsl:when>
         <xsl:otherwise>
           <xsl:number 
-            count="*[contains(@class, ' learningInteractionBase2-d/lcInteractionBase2 ')]"
+            count="*[contains(@class, ' learningInteractionBase2-d/lcInteractionBase2 ')] |
+                   *[contains(@class, ' learningInteractionBase-d/lcInteractionBase ')]"
             format="{$numberFormat}"
           />
         </xsl:otherwise>
