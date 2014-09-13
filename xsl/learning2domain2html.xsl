@@ -154,7 +154,7 @@
   
   <xsl:template match="*[contains(@class, ' learning2-d/lcTrueFalse2 ')] |
                        *[contains(@class, ' learning-d/lcTrueFalse ')]">
-    <xsl:call-template name="constructInteractionWithAnswerOptionGroup"/>    
+    <xsl:call-template name="constructInteraction"/>    
   </xsl:template>
     
    
@@ -180,7 +180,7 @@
   
   <xsl:template match="*[contains(@class, ' learning2-d/lcSingleSelect2 ')] |
                        *[contains(@class, ' learning-d/lcSingleSelect ')]">
-    <xsl:call-template name="constructInteractionWithAnswerOptionGroup"/>    
+    <xsl:call-template name="constructInteraction"/>    
   </xsl:template>
   
   <!-- =====================
@@ -270,7 +270,7 @@
   
   <xsl:template match="*[contains(@class, ' learning2-d/lcMultipleSelect2 ')] | 
                        *[contains(@class, ' learning-d/lcMultipleSelect ')]">
-    <xsl:call-template name="constructInteractionWithAnswerOptionGroup"/>    
+    <xsl:call-template name="constructInteraction"/>    
   </xsl:template>
 
   <!-- =====================
@@ -279,7 +279,7 @@
 
   <xsl:template match="*[contains(@class, ' learning2-d/lcSequencing2 ')] |
                        *[contains(@class, ' learning-d/lcSequencing ')]">
-    <xsl:call-template name="constructInteractionWithAnswerOptionGroup"/>
+    <xsl:call-template name="constructInteraction"/>
   </xsl:template>
   
   <!-- =====================
@@ -287,7 +287,59 @@
        ===================== -->
   <xsl:template match="*[contains(@class, ' learning2-d/lcMatching2 ')] |
                        *[contains(@class, ' learning-d/lcMatching ')]">
-    <xsl:next-match/>
+    <xsl:call-template name="constructInteraction"/>
+  </xsl:template>
+  
+  <xsl:template match="*[contains(@class, ' learning2-d/lcMatchTable2 ')] | 
+                       *[contains(@class, ' learning-d/lcMatchTable ')]">
+    <table width="auto">
+      <xsl:call-template name="lc-setClassAtt"/>
+      <!-- The colgroup is here so that CSS can easily control the column
+           formatting details.
+        -->
+      <colgroup>
+        <col class="lc-matchTable-col-answerItemLabel"/>
+        <col class="lc-matchTable-col-item"/>
+        <col class="lc-matchTable-col-matchItem"/>
+      </colgroup>
+      <!-- FIXME: Randomize the order of the second column items -->
+      <xsl:apply-templates/>
+    </table>
+  </xsl:template>
+  
+  <xsl:template match="*[contains(@class, ' learning2-d/lcMatchingPair2 ')] | 
+                       *[contains(@class, ' learning-d/lcMatchingPair ')]">
+    <tr>
+      <xsl:call-template name="lc-setClassAtt"/>
+      <xsl:apply-templates/>
+    </tr>
+  </xsl:template>
+  
+  <xsl:template match="*[contains(@class, ' learning2-d/lcItem2 ')] | 
+                       *[contains(@class, ' learning-d/lcItem ')]">
+    <td class="lc-answer-option-label-cell">
+      <span class="lc-answer-option-label">
+        <xsl:number count="*[contains(@class, ' learning2-d/lcMatchingPair2 ')] |
+                           *[contains(@class, ' learning-d/lcMatchingPair ')]"
+          format="{$lc-answer-option-number-format}"
+          from="*[contains(@class, ' learning2-d/lcMatchTable2 ')] |
+                *[contains(@class, ' learning-d/lcMatchTable ')]"
+        /><xsl:text>&#xa0;</xsl:text>
+      </span>
+    </td>
+    <td>
+      <xsl:call-template name="lc-setClassAtt"/>
+      <xsl:apply-templates/>
+    </td>
+  </xsl:template>
+  
+  <xsl:template match="*[contains(@class, ' learning2-d/lcMatchingItem2 ')] | 
+                       *[contains(@class, ' learning-d/lcMatchingItem ')]">
+    <td>
+      <xsl:call-template name="lc-setClassAtt"/>
+      <span class="lc-MatchingItem-blank">___</span>
+      <xsl:apply-templates/>
+    </td>
   </xsl:template>
   
   <!-- =====================
@@ -295,7 +347,7 @@
        ===================== -->
   <xsl:template match="*[contains(@class, ' learning2-d/lcHotspot2 ')] |
                        *[contains(@class, ' learning-d/lcHotspot ')]">
-    <xsl:next-match/>
+    <xsl:call-template name="constructInteraction"/>
   </xsl:template>
   
   <!-- =====================
@@ -303,7 +355,7 @@
        ===================== -->
   <xsl:template match="*[contains(@class, ' learning2-d/lcOpenQuestion2 ')] |
                        *[contains(@class, ' learning-d/lcOpenQuestion ')]">
-    <xsl:call-template name="constructInteractionWithAnswerOptionGroup"/>    
+    <xsl:call-template name="constructInteraction"/>    
   </xsl:template>
   
   <!-- =====================
@@ -324,7 +376,7 @@
        General interaction support templates and functions.
        ==================================================== -->
   
-  <xsl:template name="constructInteractionWithAnswerOptionGroup">
+  <xsl:template name="constructInteraction">
     <xsl:param name="baseClass" as="xs:string*" select="lc:getBaseLcTypeForElement(.)"/>
     <xsl:param name="lc:showOnlyCorrectAnswer" as="xs:boolean" tunnel="yes"
       select="$lc:doShowOnlyCorrectAnswer"
@@ -344,9 +396,14 @@
                   *[contains(@class, ' learningInteractionBase-d/lcQuestionBase ')]"
         />
       </xsl:if>
+      <!-- The question options, whatever form they might take: -->
       <xsl:apply-templates 
         select="*[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')] |
-                *[contains(@class, ' learning-d/lcAnswerOptionGroup ')]"
+                *[contains(@class, ' learning-d/lcAnswerOptionGroup ')] |
+                *[contains(@class, ' learning2-d/lcMatchTable2 ')] |
+                *[contains(@class, ' learning-d/lcMatchTable ')] |
+                *[contains(@class, ' learning2-d/lcHotspotMap2 ')] |
+                *[contains(@class, ' learning-d/lcHotspotMap ')]"
       />
     </div>
   </xsl:template>
@@ -522,7 +579,7 @@
   </xsl:function>
        
   <xsl:template name="lc-setClassAtt">
-    <xsl:param name="baseClass" select="''" as="xs:string*"/>
+    <xsl:param name="baseClass" select="lc:getBaseLcTypeForElement(.)" as="xs:string*"/>
     <xsl:variable name="classAtt" as="attribute()">
       <xsl:apply-templates select="." mode="set-output-class"/>      
     </xsl:variable>
