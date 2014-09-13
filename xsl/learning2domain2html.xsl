@@ -3,7 +3,8 @@
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl"
   xmlns:lc="urn:function:learningContent"
-  exclude-result-prefixes="xs xd lc"
+  xmlns:random="http://exslt.org/random"
+  exclude-result-prefixes="xs xd lc random"
   version="2.0">
   <!-- ========================================================
         Learning Domain (questions and answers) HTML generation.
@@ -288,41 +289,59 @@
   
   <xsl:template match="*[contains(@class, ' learning2-d/lcMatchTable2 ')] | 
                        *[contains(@class, ' learning-d/lcMatchTable ')]">
-    <table width="auto">
+    <!-- Seed to use for generating a random number -->
+    <xsl:variable name="seed"  as="xs:double"
+      select="4.2"
+    />
+    <xsl:message> + [DEBUG] matchTable: seed=<xsl:sequence select="$seed"/></xsl:message>
+
+      <table width="auto">
       <xsl:call-template name="lc-setClassAtt"/>
       <!-- The colgroup is here so that CSS can easily control the column
            formatting details.
-        -->
       <colgroup>
         <col class="lc-matchTable-col-answerItemLabel"/>
         <col class="lc-matchTable-col-item"/>
         <col class="lc-matchTable-col-matchItem"/>
       </colgroup>
-      <!-- FIXME: Randomize the order of the second column items -->
-      <xsl:apply-templates/>
+        -->
+      
+      <xsl:variable name="matchFromItems" as="element()*"
+        select="*[contains(@class, ' learning2-d/lcMatchingPair2 ')]/*[contains(@class, ' learning2-d/lcItem2 ')] | 
+                *[contains(@class, ' learning-d/lcMatchingPair ')]/*[contains(@class, ' learning-d/lcItem ')]"
+      />
+      <xsl:variable name="matchToItems" as="element()*"
+        select="*[contains(@class, ' learning2-d/lcMatchingPair2 ')]/*[contains(@class, ' learning2-d/lcMatchingItem2 ')] | 
+                *[contains(@class, ' learning-d/lcMatchingPair ')]/*[contains(@class, ' learning-d/lcMatchingItem ')]"
+      />
+      <xsl:variable name="matchToItemsShuffled" as="element()*"
+        select="lc:shuffleItems($matchToItems, (), $seed)"
+      />
+      <xsl:message> + [DEBUG] matchTable: matchToItemsShuffled=<xsl:sequence select="$matchToItemsShuffled"/></xsl:message>
+        <tbody>
+          <xsl:for-each select="$matchFromItems">
+            <xsl:variable name="pos" as="xs:integer" select="position()"/>
+            <tr class="lcMatchingPair tr">         
+              <td class="lc-answer-option-label-cell">
+                <span class="lc-answer-option-label">
+                  <xsl:number count="*[contains(@class, ' learning2-d/lcMatchingPair2 ')] |
+                                     *[contains(@class, ' learning-d/lcMatchingPair ')]"
+                    format="{$lc-answer-option-number-format}"
+                    from="*[contains(@class, ' learning2-d/lcMatchTable2 ')] |
+                          *[contains(@class, ' learning-d/lcMatchTable ')]"
+                  /><xsl:text>&#xa0;</xsl:text>
+                </span>
+              </td>
+              <xsl:apply-templates select="."/>
+              <xsl:apply-templates select="$matchToItemsShuffled[$pos]"/>
+            </tr>
+          </xsl:for-each>
+        </tbody>      
     </table>
-  </xsl:template>
-  
-  <xsl:template match="*[contains(@class, ' learning2-d/lcMatchingPair2 ')] | 
-                       *[contains(@class, ' learning-d/lcMatchingPair ')]">
-    <tr>
-      <xsl:call-template name="lc-setClassAtt"/>
-      <xsl:apply-templates/>
-    </tr>
   </xsl:template>
   
   <xsl:template match="*[contains(@class, ' learning2-d/lcItem2 ')] | 
                        *[contains(@class, ' learning-d/lcItem ')]">
-    <td class="lc-answer-option-label-cell">
-      <span class="lc-answer-option-label">
-        <xsl:number count="*[contains(@class, ' learning2-d/lcMatchingPair2 ')] |
-                           *[contains(@class, ' learning-d/lcMatchingPair ')]"
-          format="{$lc-answer-option-number-format}"
-          from="*[contains(@class, ' learning2-d/lcMatchTable2 ')] |
-                *[contains(@class, ' learning-d/lcMatchTable ')]"
-        /><xsl:text>&#xa0;</xsl:text>
-      </span>
-    </td>
     <td>
       <xsl:call-template name="lc-setClassAtt"/>
       <xsl:apply-templates/>
@@ -749,6 +768,41 @@
                       $context/*[contains(@class, ' learning-d/lcCorrectResponse ')])"
     />
     <xsl:sequence select="$result"/>
+  </xsl:function>
+  
+  <xsl:function name="lc:shuffleItems" as="node()*">
+    <xsl:param name="sourceItems" as="node()*"/>
+    <xsl:param name="resultItems" as="node()*"/>
+    <xsl:param name="seed" as="xs:double"/>
+    <xsl:choose>
+      <xsl:when test="count($sourceItems) = 1">
+        <xsl:sequence select="$resultItems, $sourceItems"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:variable name="itemIndex" 
+          select="xs:integer(random:random-sequence(1, $seed)*10) + 1" 
+          as="xs:integer"/>
+        <xsl:variable name="nextResultItem" select="$sourceItems[$itemIndex]"/>
+        <xsl:choose>
+          <xsl:when test="$nextResultItem">
+            <xsl:sequence 
+              select="lc:shuffleItems(
+                 ($sourceItems except $nextResultItem), 
+                 ($resultItems, $nextResultItem), 
+                 $seed + $itemIndex)"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <!-- Try again -->
+            <xsl:sequence 
+              select="lc:shuffleItems(
+                 $sourceItems, 
+                 $resultItems, 
+                 $seed + $itemIndex)"
+            />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:function>
        
   <xsl:template name="lc-setClassAtt">

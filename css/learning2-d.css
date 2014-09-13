@@ -14,9 +14,14 @@
   display: list-item;  
 }
 
- .lc-answer-option-label {
+td > .lc-answer-option-label {
+   display: block;
+ }
+
+.lc-answer-option-label {
    display: none;
  }
+ 
  
  .lc-answer-option-content {
    display: inline;
@@ -43,12 +48,13 @@
   
 }
 
-.lc--answer-item-label {
+.lc-answer-item-label {
   font-weight: bold;
   color: blue;
 }
+
 .lc-matchTable-col-answerItemLabel {
-  width: 20px;
+  width: 3em;
 }
 
 
