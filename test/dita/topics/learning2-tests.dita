@@ -67,8 +67,10 @@
           <lcMatchingItem2>Little Girl in Blue Armchair</lcMatchingItem2>
         </lcMatchingPair2>
       </lcMatchTable2>
-      </lcMatching2> <lcHotspot2 id="lcHotspot_ec5_yxc_jp">
-      <lcQuestion2>This is a hotspot question. This is a diorama of the Apollo 11 moon landing, using a real Lunar Lander that was never sent to space. It represents the initial egress of the astronaunts onto the lunar surface. Based on your knowledge of the Apollo 11 mission, select Neil Armstrong.</lcQuestion2>
+      </lcMatching2> 
+      <lcHotspot2 id="lcHotspot_ec5_yxc_jp">
+      <lcQuestion2>This is a hotspot question with only feedback for each area, no separate xref.
+        This is a diorama of the Apollo 11 moon landing, using a real Lunar Lander that was never sent to space. It represents the initial egress of the astronaunts onto the lunar surface. Based on your knowledge of the Apollo 11 mission, select Neil Armstrong.</lcQuestion2>
       <lcHotspotMap2 id="lcHotspotMap_kd5_yxc_jp">
         <image href="media/moon-landing-01.JPG" id="image_l5g_5yc_jp">
           <alt>Diorama of the Apollo 11 moon landing (National Air and Space Museum)</alt>
@@ -76,14 +78,22 @@
         <lcArea2 id="aldrin">
           <lcAreaShape2>rect</lcAreaShape2>
           <lcAreaCoords2>363,15,594,353</lcAreaCoords2>
+          <!-- xref can go here -->
+          <lcFeedback2>
+            <p>This is Buzz Aldrin</p>
+          </lcFeedback2>          
         </lcArea2>
         <lcArea2 id="armstrong">
           <lcAreaShape2>rect</lcAreaShape2>
           <lcAreaCoords2>65,231,218,445</lcAreaCoords2>
           <lcCorrectResponse2/>
+          <lcFeedback2>
+            <p>This is Neil Armstrong.</p>
+          </lcFeedback2>
         </lcArea2>
       </lcHotspotMap2>
-      </lcHotspot2> <lcTrueFalse2 id="lcTrueFalse_ukc_y1d_jp">
+      </lcHotspot2>
+      <lcTrueFalse2 id="lcTrueFalse_ukc_y1d_jp">
       <lcQuestion2>This is a true-false question: Neil Armstrong crashed a lunar lander simulator during training, walked away from the crash, and was seen calmly sitting in his office an hour later.</lcQuestion2>
       <lcAnswerOptionGroup2 id="lcAnswerOptionGroup2_ylc_y1d_jp">
         <lcAnswerOption2>

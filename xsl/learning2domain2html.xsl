@@ -204,15 +204,11 @@
       select="$lc:doShowOnlyCorrectAnswer"
     />
     
-    <xsl:variable name="isCorrectAnswer" as="xs:boolean"
-      select="boolean(./*[contains(@class, ' learning2-d/lcCorrectResponse2 ')] |
-                       *[contains(@class, ' learning-d/lcCorrectResponse ')])"
-    />
     <xsl:choose>
-      <xsl:when test="($lc:showOnlyCorrectAnswer and not($isCorrectAnswer))">
+      <xsl:when test="($lc:showOnlyCorrectAnswer and not(lc:isCorrectAnswer(.)))">
         <!-- Do nothing: incorrect answers are suppressed -->
       </xsl:when>
-      <xsl:when test="($lc:showOnlyCorrectAnswer and $isCorrectAnswer)">
+      <xsl:when test="($lc:showOnlyCorrectAnswer and lc:isCorrectAnswer(.))">
         <!-- When we're only showing the correct answers, we have to generate
              the answer option label.
           -->
@@ -221,7 +217,7 @@
           <xsl:call-template name="lc-setClassAtt">
             <xsl:with-param name="baseClass" 
               as="xs:string*"
-              select="'lcAnswerOption', if ($isCorrectAnswer) then 'lc-correct-response' else ''" 
+              select="'lcAnswerOption', if (lc:isCorrectAnswer(.)) then 'lc-correct-response' else ''" 
             />
           </xsl:call-template>
           <xsl:apply-templates select="." mode="lc-set-answer-option-label"/>
@@ -239,7 +235,7 @@
           <xsl:call-template name="lc-setClassAtt">
             <xsl:with-param name="baseClass" 
               as="xs:string*"
-              select="'lcAnswerOption', if ($isCorrectAnswer) then 'lc-correct-response' else ''" 
+              select="'lcAnswerOption', if (lc:isCorrectAnswer(.)) then 'lc-correct-response' else ''" 
             />
           </xsl:call-template>
     <!--      <xsl:apply-templates select="." mode="lc-set-answer-option-label"/>-->
@@ -348,6 +344,163 @@
   <xsl:template match="*[contains(@class, ' learning2-d/lcHotspot2 ')] |
                        *[contains(@class, ' learning-d/lcHotspot ')]">
     <xsl:call-template name="constructInteraction"/>
+  </xsl:template>
+  
+  <xsl:template match="*[contains(@class, ' learning2-d/lcHotspotMap2 ')] |
+                       *[contains(@class, ' learning-d/lcHotspotMap ')]">
+    
+    <div>
+      <xsl:call-template name="lc-setClassAtt"/>
+      <xsl:apply-templates/>
+    </div>
+  </xsl:template>
+  
+  <xsl:template match="*[contains(@class, ' learning2-d/lcHotspotMap2 ')] |
+                       *[contains(@class, ' learning-d/lcHotspotMap ')]">
+    <xsl:variable name="mapId" as="xs:string" select="concat('hsMap-', generate-id(.))"/>
+    <div>
+      <xsl:call-template name="lc-setClassAtt"/>
+      <xsl:apply-templates select="*[contains(@class, ' topic/image ')]">
+        <xsl:with-param name="mapId" as="xs:string" tunnel="yes" select="$mapId"/>
+      </xsl:apply-templates>
+      <map name="{$mapId}" id="{$mapId}">
+        <xsl:apply-templates mode="lc:imagemap"
+          select="*[contains(@class, ' learning2-d/lcArea2 ')] |
+                  *[contains(@class, ' learning-d/lcArea ')]"/>
+      </map>     
+      <div class="lc-hotspot-feedback">
+        <xsl:choose>
+          <xsl:when 
+            test="*/*[contains(@class, ' learning2-d/lcFeedback2 ')] |
+                  */*[contains(@class, ' learning-d/lcFeedback ')]">
+            <xsl:apply-templates mode="lc:hotspotFeedback"
+              select="*[contains(@class, ' learning2-d/lcArea2 ')] |
+                      *[contains(@class, ' learning-d/lcArea ')]">
+              <!-- For hot spots we show the feedback if there's no xrefs in the areas -->
+              <xsl:with-param name="lc:showFeedback" as="xs:boolean" tunnel="yes"                
+                             select="true()"/>
+            </xsl:apply-templates>
+          </xsl:when>
+          <xsl:when test="not(*[contains(@class, ' topic/xref ')])">
+            <!-- No feedback and no xref, synthesize correct/incorrect feedback -->
+            <xsl:apply-templates mode="lc:hotspotFeedbackSynthesize"
+              select="*[contains(@class, ' learning2-d/lcArea2 ')] |
+                      *[contains(@class, ' learning-d/lcArea ')]"/>
+              
+          </xsl:when>
+          <xsl:otherwise>
+            <!-- There must be feedback or an xref, nothing to do. -->
+          </xsl:otherwise>
+        </xsl:choose>
+      </div>
+    </div>
+  </xsl:template>
+  
+  <xsl:template mode="lc:imagemap" 
+    match="*[contains(@class, ' learning2-d/lcArea2 ')] |
+           *[contains(@class, ' learning-d/lcArea ')]">
+    <area>
+      <xsl:apply-templates mode="lc:set-attributes"/> <!-- Sets the @shap and @coords attributes -->
+      <xsl:apply-templates mode="lc:set-area-href" select="."/>
+    </area>
+  </xsl:template>
+  
+  <xsl:template mode="lc:set-area-href" 
+    match="*[contains(@class, ' learning2-d/lcArea2 ')] |
+           *[contains(@class, ' learning-d/lcArea ')]">
+    <!-- Default template for setting the @href on the area. Override
+         this template to link somewhere else.
+      -->
+    
+    <xsl:variable name="targetUri" as="xs:string">
+      <xsl:choose>
+        <xsl:when test="*[contains(@class, ' topic/xref ')]">
+          <!-- Use the xref's target URI -->
+          <xsl:value-of select="'{xref in area not implemented}'"/>
+        </xsl:when>
+        <xsl:when test="*[contains(@class, ' learning2-d/lcFeedback2 ')] |
+           *[contains(@class, ' learning-d/lcFeedback ')]">
+          <xsl:sequence select="concat('#', lc:getLcAreaFeedbackId(.))"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <!-- If there's no feedback or xref we generate a correct/incorrect feedback. -->
+          <xsl:sequence select="concat('#', lc:getLcAreaFeedbackId(.))"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:attribute name="href" select="$targetUri"/>
+    
+  </xsl:template>
+
+  <xsl:template mode="lc:set-attributes" match="text()"/><!-- Suppress all text -->
+  
+  <xsl:template mode="lc:set-attributes" 
+    match="*[contains(@class, ' learning2-d/lcAreaShape2 ')] |
+           *[contains(@class, ' learning-d/lcAreaShape ')]">
+    <xsl:attribute name="shape" select="normalize-space(.)"/>
+  </xsl:template>
+
+  <xsl:template mode="lc:set-attributes" 
+    match="*[contains(@class, ' learning2-d/lcAreaCoords2 ')] |
+           *[contains(@class, ' learning-d/lcAreaCoords ')]">
+    <xsl:attribute name="coords" select="normalize-space(.)"/>
+  </xsl:template>
+
+  <xsl:template mode="lc:hotspotFeedback" 
+    match="*[contains(@class, ' learning2-d/lcArea2 ')] |
+           *[contains(@class, ' learning-d/lcArea ')]">
+    <div id="{lc:getLcAreaFeedbackId(.)}" class="lc-hotspot-area-feedback">
+      <xsl:apply-templates 
+        select="*[contains(@class, ' learning2-d/lcFeedback2 ')] |
+                *[contains(@class, ' learning-d/lcFeedback ')]"/>
+    </div>
+  </xsl:template>
+
+  <xsl:template mode="lc:hotspotFeedbackSynthesize" 
+    match="*[contains(@class, ' learning2-d/lcArea2 ')] |
+           *[contains(@class, ' learning-d/lcArea ')]">
+    <div id="{lc:getLcAreaFeedbackId(.)}" class="lc-hotspot-area-feedback">
+      <p>
+        <xsl:choose>
+          <xsl:when test="lc:isCorrectAnswer(.)">
+            <xsl:text>Correct.</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>Incorrect.</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </p>
+    </div>
+  </xsl:template>
+
+
+  <xsl:template match="*[contains(@class, ' learning2-d/lcHotspotMap2 ')]/*[contains(@class, ' topic/image ')] |
+                       *[contains(@class, ' learning-d/lcHotspotMap ')]/*[contains(@class, ' topic/image ')]">
+    
+    <xsl:variable name="baseImg" as="node()*">
+      <xsl:call-template name="topic-image"/>
+    </xsl:variable>
+    
+    <xsl:apply-templates select="$baseImg" mode="addUsemapAtt"/>
+    
+  </xsl:template>
+  
+  <xsl:template mode="addUsemapAtt" match="img" >
+    <xsl:param name="mapId" as="xs:string" tunnel="yes"/>
+    <xsl:copy>
+      <xsl:attribute name="usemap" select="$mapId"/>
+      <xsl:apply-templates mode="#current" select="@*,node()"/>
+    </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template mode="addUsemapAtt" match="*" priority="-1">
+    <xsl:copy>
+      <xsl:apply-templates mode="#current" select="@*,node()"/>
+    </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template mode="addUsemapAtt" match="@* | text() | processing-instruction()" priority="-1">
+    <xsl:sequence select="."/>
   </xsl:template>
   
   <!-- =====================
@@ -575,6 +728,26 @@
           </xsl:otherwise>
         </xsl:choose>
     </xsl:variable>  
+    <xsl:sequence select="$result"/>
+  </xsl:function>
+  
+  <xsl:function name="lc:getLcAreaFeedbackId" as="xs:string">
+    <!-- Generates a unique ID to use for linking to the feedback associated with a hotspot area. -->
+    <xsl:param name="areaElem" as="element()"/>
+    <xsl:variable name="result" select="concat('lc-area-feedback_', generate-id($areaElem))"/>
+    <xsl:sequence select="$result"/>
+  </xsl:function>
+  
+  <xsl:function name="lc:isCorrectAnswer" as="xs:boolean">
+    <!-- Returns true if the element is a correct response. 
+         Context element must be an element that may directly contain
+         an lcCorrectResponse element.
+      -->
+    <xsl:param name="context" as="element()"/>
+    <xsl:variable name="result" as="xs:boolean"
+      select="boolean($context/*[contains(@class, ' learning2-d/lcCorrectResponse2 ')] |
+                      $context/*[contains(@class, ' learning-d/lcCorrectResponse ')])"
+    />
     <xsl:sequence select="$result"/>
   </xsl:function>
        
