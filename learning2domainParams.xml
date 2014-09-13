@@ -8,4 +8,5 @@
   <param name="lc-question-number-suffix" expression="${arg.lc.html.questionNumberSuffix}" if="arg.lc.html.questionNumberSuffix"/>  
   <param name="lc-answer-option-number-format" expression="${arg.lc.html.answerOptionNumberFormat}" if="arg.lc.html.answerOptionNumberFormat"/>
   <param name="lc-show-only-correct-answer" expression="${arg.lc.html.showOnlyCorrectAnswer}" if="arg.lc.html.showOnlyCorrectAnswer"/>
+  <param name="lc-show-only-feedback" expression="${arg.lc.html.showOnlyFeedback}" if="arg.lc.html.showOnlyFeedback"/>
 </extension>

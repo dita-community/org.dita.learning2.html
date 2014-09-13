@@ -24,6 +24,15 @@
           control how numbers are generated and formatted.
           
         
+        NOTE: variables named "lc:doXXX" are global booleans set from
+              global parameters. Tunnel parameters named "lc:xxx" where
+              "xxx" is the same as "XXX" from the "lc:doXXX" parameter, 
+              allow overriding of the global default from calling templates.
+              This lets you override the handling of any element that contains
+              interactions in order to change details, such as showing
+              feedback or only showing correct answers (e.g., generating
+              an answer key from questions also shown as full questions
+              in another context).
   
   ======================================================== -->
   
@@ -54,12 +63,26 @@
     select="matches($lc-number-questions, '1|yes|true|on', 'i')"
   />
   
+  <!-- Display only the feedback for a question, not the question (prompt)
+       or any answer option content. This option lets you generate an
+       answer key that has just answer option labels and feedback.
+       
+       Default is "no" (show other stuff in addition to feedback)
+       
+       If this is set to true, it implies lc-show-feedback.
+    -->
+  <xsl:param name="lc-show-only-feedback" as="xs:string" select="'no'"/>
+  <xsl:variable name="lc:doShowOnlyFeedback" as="xs:boolean"
+    select="matches($lc-show-only-feedback, '1|yes|true|on', 'i')"
+  />
+
   <!-- When set on, show feedback for answer options and entire questions
        in the output.  Default is "false" (suppress feedback).
     -->
   <xsl:param name="lc-show-feedback" as="xs:string" select="'false'"/>
   <xsl:variable name="lc:doShowFeedback" as="xs:boolean" 
-    select="matches($lc-show-feedback, '1|yes|true|on', 'i')"
+    select="matches($lc-show-feedback, '1|yes|true|on', 'i') or 
+            $lc:doShowOnlyFeedback"
   />
   
   <!-- When set on, adds a class value to correct answer options to allow highlighting
@@ -102,6 +125,7 @@
   <xsl:variable name="lc:doShowOnlyCorrectAnswer" as="xs:boolean"
     select="matches($lc-show-only-correct-answer, '1|yes|true|on', 'i')"
   />
+
   
   <xsl:variable name="baseBlockTypes" as="xs:string*"
      select="('dl',
@@ -202,7 +226,11 @@
           </xsl:call-template>
           <xsl:apply-templates select="." mode="lc-set-answer-option-label"/>
           <span class="lc-answer-option-content">
-            <xsl:apply-templates/>
+            <xsl:apply-templates select="if ($lc:doShowOnlyFeedback) 
+              then (*[contains(@class, ' learning-d/lcFeedback ')] | 
+                    *[contains(@class, ' learning2-d/lcFeedback2 ')])
+              else node()"
+            />
           </span>
         </div>
       </xsl:when>
@@ -427,7 +455,11 @@
   
   <xsl:template match="*[contains(@class, ' learning2-d/lcFeedback2 ')] |
                        *[contains(@class, ' learning-d/lcFeedback ')]">
-    <xsl:if test="$lc:doShowFeedback">
+    <xsl:param name="lc:showFeedback" as="xs:boolean" tunnel="yes"
+      select="$lc:doShowFeedback"
+    />
+    
+    <xsl:if test="$lc:showFeedback">
       <div>
         <xsl:call-template name="lc-setClassAtt">
           <xsl:with-param name="baseClass" select="lc:getBaseLcTypeForElement(.)" as="xs:string*"/>
