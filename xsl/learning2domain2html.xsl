@@ -460,10 +460,25 @@
     match="*[contains(@class, ' learning2-d/lcArea2 ')] |
            *[contains(@class, ' learning-d/lcArea ')]">
     <div id="{lc:getLcAreaFeedbackId(.)}" class="lc-hotspot-area-feedback">
+      <span class="lc-area-feedback-label"><xsl:apply-templates select="." mode="lc:hotspotAreaFeedbackLabel"/></span>
       <xsl:apply-templates 
         select="*[contains(@class, ' learning2-d/lcFeedback2 ')] |
                 *[contains(@class, ' learning-d/lcFeedback ')]"/>
     </div>
+  </xsl:template>
+  
+  <xsl:template mode="lc:hotspotAreaFeedbackLabel" 
+    match="*[contains(@class, ' learning2-d/lcArea2 ')] |
+           *[contains(@class, ' learning-d/lcArea ')]">
+    <xsl:text>Area </xsl:text>
+    <xsl:number count="*[contains(@class, ' learning2-d/lcArea2 ')] |
+           *[contains(@class, ' learning-d/lcArea ')]"
+           level="single"
+           from="*[contains(@class, ' learning2-d/lcHotspotMap2 ')] |
+           *[contains(@class, ' learning-d/lcHotspotMap ')]"
+           format="1"
+    />
+    <xsl:text>: </xsl:text>
   </xsl:template>
 
   <xsl:template mode="lc:hotspotFeedbackSynthesize" 
@@ -471,6 +486,7 @@
            *[contains(@class, ' learning-d/lcArea ')]">
     <div id="{lc:getLcAreaFeedbackId(.)}" class="lc-hotspot-area-feedback">
       <p>
+        <span class="lc-area-feedback-label"><xsl:apply-templates select="." mode="lc:hotspotAreaFeedbackLabel"/></span>
         <xsl:choose>
           <xsl:when test="lc:isCorrectAnswer(.)">
             <xsl:text>Correct.</xsl:text>
