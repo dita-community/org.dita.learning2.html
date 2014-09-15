@@ -367,15 +367,6 @@
   
   <xsl:template match="*[contains(@class, ' learning2-d/lcHotspotMap2 ')] |
                        *[contains(@class, ' learning-d/lcHotspotMap ')]">
-    
-    <div>
-      <xsl:call-template name="lc-setClassAtt"/>
-      <xsl:apply-templates/>
-    </div>
-  </xsl:template>
-  
-  <xsl:template match="*[contains(@class, ' learning2-d/lcHotspotMap2 ')] |
-                       *[contains(@class, ' learning-d/lcHotspotMap ')]">
     <xsl:variable name="mapId" as="xs:string" select="concat('hsMap-', generate-id(.))"/>
     <div>
       <xsl:call-template name="lc-setClassAtt"/>
@@ -611,63 +602,64 @@
     <xsl:variable name="questionNumber" as="node()*">
       <xsl:call-template name="lcGetQuestionNumber"/>
     </xsl:variable>
-    <xsl:variable name="textBeforeBlocks">
-      <xsl:sequence select="(text() | *[not(lc:isBlock(.))])[not(preceding-sibling::*[lc:isBlock(.)])]"/>
-    </xsl:variable>
-    <xsl:variable name="hasTextBeforeBlocks" as="xs:boolean"
-      select="normalize-space(string($textBeforeBlocks)) != ''"
-    />
-    <xsl:variable name="firstPara" as="node()*">
-      <xsl:choose>
-        <xsl:when test="not($hasTextBeforeBlocks) and lc:hasBlockChildren(.)">
-          <!-- No text but there are blocks, so use the first one -->
-          <xsl:apply-templates select="*[1]">
-            <xsl:with-param name="questionNumber" select="$questionNumber" as="node()*"/>
-          </xsl:apply-templates>
-        </xsl:when>
-        <xsl:otherwise>
-          <!-- There is text before the first block or there is only text, put it in a paragraph along
-               with the question number.
-            -->
-          <p>
-             <xsl:call-template name="commonattributes"/>
-             <xsl:call-template name="setid"/>
-            <xsl:sequence select="$questionNumber"/>
-            <xsl:apply-templates select="$textBeforeBlocks"/>
-          </p>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    <xsl:variable name="remainingBlocks" as="node()*">
-      <xsl:choose>
-        <xsl:when test="$hasTextBeforeBlocks">
-          <xsl:apply-templates select="node() except($textBeforeBlocks)"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:apply-templates select="*[position() > 1]"/>
-        </xsl:otherwise>
-      </xsl:choose>      
-    </xsl:variable>
     <div>
       <xsl:call-template name="lc-setClassAtt">
         <xsl:with-param name="baseClass" select="'lc-question-wrapper'" as="xs:string*"/>
       </xsl:call-template>
-      <xsl:sequence select="$firstPara"/>
-      <xsl:sequence select="$remainingBlocks"/>
+      <xsl:for-each-group select="*|text()[matches(.,'\S')]" group-adjacent="lc:isBlock(.)">
+        <xsl:choose>
+          <xsl:when test="position() = 1">
+            <!-- Add the question number to the first block, whatever it is -->
+            <xsl:choose>
+              <xsl:when test="current-grouping-key() = true()">
+                <!-- Block element -->
+                <xsl:apply-templates select="." mode="lc:addQuestionNumberToBlock">
+                  <xsl:with-param name="questionNumber" as="node()*" select="$questionNumber"/>
+                </xsl:apply-templates>
+                <xsl:apply-templates select="current-group()[position() > 1]"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <p>
+                  <xsl:sequence select="$questionNumber"/>
+                  <xsl:apply-templates select="current-group()"/>
+                </p>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:choose>
+              <xsl:when test="current-grouping-key() = true()">
+                <!-- Must be a block of some sort -->
+                <xsl:apply-templates select="current-group()"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <!-- Non-block stuff. Put in a paragraph -->
+                <p>
+                  <xsl:call-template name="commonattributes"/>
+                  <xsl:apply-templates select="current-group()"/>
+                </p>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each-group>
     </div>
   </xsl:template>
   
-  <xsl:template match="*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')]/*[contains(@class, ' topic/p ')]">
+  <xsl:template mode="lc:addQuestionNumberToBlock" match="*[contains(@class, ' topic/p ')]">
     <xsl:param name="questionNumber" as="node()*"/>
-    <!-- Outputs the question number if it's been specified. Used for the first paragraph within a question. -->
     <p>
       <xsl:call-template name="commonattributes"/>
       <xsl:call-template name="setid"/>
       <xsl:sequence select="$questionNumber"/>
-      <xsl:apply-templates/>
+      <xsl:apply-templates/>      
     </p>
   </xsl:template>
   
+  <xsl:template mode="lc:addQuestionNumberToBlock" match="*" priority="-1">
+    <xsl:message> + [WARN] lc:addQuestionNumberToBlock: Unhandled element <xsl:value-of select="concat(name(..), '/', name(.))"/></xsl:message>
+  </xsl:template>
+
   <xsl:template match="*[contains(@class, ' learning-d/lcAnswerContent ')]">
     <span>
       <xsl:call-template name="lc-setClassAtt"/>
@@ -733,7 +725,7 @@
   </xsl:function>
   
   <xsl:function name="lc:isBlock" as="xs:boolean">
-    <xsl:param name="context" as="element()"/>
+    <xsl:param name="context" as="node()"/>
     <xsl:variable name="result" as="xs:boolean">
       <xsl:choose>
           <xsl:when test="contains($context/@class, ' topic/')">
