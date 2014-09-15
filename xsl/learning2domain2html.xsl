@@ -127,6 +127,11 @@
     select="matches($lc-show-only-correct-answer, '1|yes|true|on', 'i')"
   />
 
+  <xsl:param name="lc-hide-question-labels" as="xs:string" select="'no'"/>
+  <xsl:variable name="lc:doShowQuestionLabels" as="xs:boolean"
+    select="not(matches($lc-hide-question-labels, '1|yes|true|on', 'i'))"
+  />
+
   
   <xsl:variable name="lc:baseBlockTypes" as="xs:string*"
      select="('dl',
@@ -213,7 +218,6 @@
         <!-- When we're only showing the correct answers, we have to generate
              the answer option label.
           -->
-        <xsl:message> + [DEBUG] doShowOnlyCorrectAnswer=true, isCorrectAnswer.</xsl:message>
         <div>
           <xsl:call-template name="lc-setClassAtt">
             <xsl:with-param name="baseClass" 
@@ -293,7 +297,7 @@
     <xsl:variable name="seed"  as="xs:double"
       select="4.2"
     />
-    <xsl:message> + [DEBUG] matchTable: seed=<xsl:sequence select="$seed"/></xsl:message>
+<!--    <xsl:message> + [DEBUG] matchTable: seed=<xsl:sequence select="$seed"/></xsl:message>-->
 
       <table width="auto">
       <xsl:call-template name="lc-setClassAtt"/>
@@ -317,7 +321,7 @@
       <xsl:variable name="matchToItemsShuffled" as="element()*"
         select="lc:shuffleItems($matchToItems, (), $seed)"
       />
-      <xsl:message> + [DEBUG] matchTable: matchToItemsShuffled=<xsl:sequence select="$matchToItemsShuffled"/></xsl:message>
+<!--      <xsl:message> + [DEBUG] matchTable: matchToItemsShuffled=<xsl:sequence select="$matchToItemsShuffled"/></xsl:message>-->
         <tbody>
           <xsl:for-each select="$matchFromItems">
             <xsl:variable name="pos" as="xs:integer" select="position()"/>
@@ -587,15 +591,17 @@
     </div>
   </xsl:template>
   
-  <xsl:template match="*[contains(@class, ' learningInteractionBase2-d/lcInteractionLabel2 ')]">
-    <p>
-      <xsl:call-template name="commonattributes"/>
-      <xsl:apply-templates/>
-    </p>
+  <xsl:template match="lcInteractionLabel2 | *[contains(@class, ' learningInteractionBase2-d/lcInteractionLabel2 ')]" priority="100">
+    <xsl:if test="$lc:doShowQuestionLabels">
+      <p>
+        <xsl:call-template name="lc-setClassAtt"/>
+        <xsl:apply-templates/>
+      </p>
+    </xsl:if>
   </xsl:template>
-
+  
   <xsl:template match="*[contains(@class, ' learningInteractionBase-d/lcQuestionBase ')]">
-    <xsl:variable name="baseClass" as="xs:string"
+    <xsl:variable name="baseClass" as="xs:string*"
       select="concat(lc:getBaseLcTypeForElement(..), 'Question')"
     />
     <!-- For learning1, lcQuestionBase specializes <p> --> 
@@ -609,7 +615,7 @@
   </xsl:template>
   
   <xsl:template match="*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')]">
-    <xsl:variable name="baseClass" as="xs:string"
+    <xsl:variable name="baseClass" as="xs:string*"
       select="concat(lc:getBaseLcTypeForElement(..), 'Question')"
     />
     <!-- For learning2, lcQuestionBase specializes <div> and may contain just text
@@ -706,15 +712,18 @@
     </xsl:if>
   </xsl:template>
   
-  <xsl:function name="lc:getBaseLcTypeForElement" as="xs:string">
+  <xsl:function name="lc:getBaseLcTypeForElement" as="xs:string*">
     <xsl:param name="elem" as="element()"/>
     
     <!-- + topic/div learningInteractionBase2-d/lcInteractionBase2 learning2-d/lcMultipleSelect2  -->
+    <xsl:if test="count(tokenize($elem/@class, ' ')) lt 4">
+      <xsl:message> + [WARN] getBaseLcTypeForElement(): @class value does not have the expected 4 tokens, got "<xsl:value-of select="$elem/@class"/>"</xsl:message>
+    </xsl:if>
 
-    <xsl:variable name="lcType" as="xs:string"
+    <xsl:variable name="lcType" as="xs:string?"
       select="tokenize(tokenize($elem/@class, ' ')[4], '/')[2]"
     />
-    <xsl:variable name="baseType" as="xs:string"
+    <xsl:variable name="baseType" as="xs:string?"
       select="if (contains($lcType, '2')) 
                  then substring-before($lcType, '2')
                  else $lcType"
@@ -827,6 +836,7 @@
          cannot be implemented using XSLT alone.
       -->
     <xsl:param name="numberFormat" as="xs:string" select="$lc-question-number-format"/>
+    
     <xsl:variable name="questionNumber" as="xs:string">
       <xsl:choose>
         <xsl:when test="not($lc:doNumberQuestions)">
@@ -841,6 +851,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    
     <xsl:if test="$questionNumber != ''">
       <span class="lcQuestionNumber">
         <xsl:value-of select="$lc-question-number-prefix"/>
