@@ -128,7 +128,7 @@
   />
 
   
-  <xsl:variable name="baseBlockTypes" as="xs:string*"
+  <xsl:variable name="lc:baseBlockTypes" as="xs:string*"
      select="('dl',
               'fig',
               'image',
@@ -748,7 +748,7 @@
             <xsl:variable name="baseType"
               select="substring-after(tokenize($context/@class, ' ')[2], '/')"
             />
-            <xsl:sequence select="$baseType = $baseBlockTypes"/>
+            <xsl:sequence select="$baseType = $lc:baseBlockTypes"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:sequence select="false()"/>
