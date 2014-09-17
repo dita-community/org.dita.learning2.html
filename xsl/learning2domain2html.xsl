@@ -581,7 +581,9 @@
       </xsl:if>
       <!-- The question options, whatever form they might take: -->
       <xsl:apply-templates 
-        select="*[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')] |
+        select="*[contains(@class, ' learning2-d/lcOpenAnswer2 ')] |
+                *[contains(@class, ' learning-d/lcOpenAnswer ')] |
+                *[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')] |
                 *[contains(@class, ' learning-d/lcAnswerOptionGroup ')] |
                 *[contains(@class, ' learning2-d/lcMatchTable2 ')] |
                 *[contains(@class, ' learning-d/lcMatchTable ')] |
@@ -697,7 +699,11 @@
   </xsl:template>
   
   <xsl:template match="*[contains(@class, ' learning2-d/lcFeedback2 ')] |
-                       *[contains(@class, ' learning-d/lcFeedback ')]">
+                       *[contains(@class, ' learning-d/lcFeedback ')] |
+                       *[contains(@class, ' learning2-d/lcFeedbackCorrect2 ')] |
+                       *[contains(@class, ' learning-d/lcFeedbackCorrect ')] |
+                       *[contains(@class, ' learning2-d/lcOpenAnswer2 ')] |
+                       *[contains(@class, ' learning-d/lcOpenAnswer ')]">
     <xsl:param name="lc:showFeedback" as="xs:boolean" tunnel="yes"
       select="$lc:doShowFeedback"
     />
@@ -707,9 +713,23 @@
         <xsl:call-template name="lc-setClassAtt">
           <xsl:with-param name="baseClass" select="lc:getBaseLcTypeForElement(.)" as="xs:string*"/>
         </xsl:call-template>
+        <xsl:apply-templates select="." mode="lc:generate-feedback-label">
+          <xsl:with-param 
+            name="lc:showFeedback" 
+            as="xs:boolean" 
+            tunnel="yes" 
+            select="$lc:showFeedback"
+          />
+        </xsl:apply-templates>
         <xsl:apply-templates/>
       </div>
     </xsl:if>
+  </xsl:template>
+  
+  <xsl:template match="*" mode="lc:generate-feedback-label">
+    <!-- No default feedback label. Implement templates in this mode to generate
+         feedback labels.
+      -->
   </xsl:template>
   
   <xsl:function name="lc:getBaseLcTypeForElement" as="xs:string*">
