@@ -132,6 +132,13 @@
     select="not(matches($lc-hide-question-labels, '1|yes|true|on', 'i'))"
   />
 
+  <!-- Turn on debugging for the learning domain processing -->
+  <xsl:param name="lc-debug" as="xs:string" select="'no'"/>
+  <xsl:variable name="lc:doDebug" as="xs:boolean"
+    select="matches($lc-debug, '1|yes|true|on', 'i')"
+  />
+
+
   
   <xsl:variable name="lc:baseBlockTypes" as="xs:string*"
      select="('dl',
@@ -153,6 +160,51 @@
 
   
   <xsl:include href="plugin:org.dita.dita13base.html:xsl/dita13base2html.xsl"/>
+  
+  <xsl:template match="*[contains(@class, ' learningInteractionBase2-d/lcInteractionBase2 ')][1]" priority="100">
+    <xsl:param name="lc:doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
+    
+    <xsl:param name="lc:numberQuestions" as="xs:boolean" tunnel="yes" select="$lc:doNumberQuestions"/>
+    <xsl:param name="lc:showOnlyFeedback" as="xs:boolean" tunnel="yes" select="$lc:doShowOnlyFeedback"/>
+    <xsl:param name="lc:showFeedback" as="xs:boolean" tunnel="yes" select="$lc:doShowFeedback"/>
+    <xsl:param name="lc:styleCorrectResponses" as="xs:boolean" tunnel="yes" select="$lc:doStyleCorrectResponses"/>
+    <xsl:param name="lc:showOnlyCorrectAnswer" as="xs:boolean" tunnel="yes" select="$lc:doShowOnlyCorrectAnswer"/>
+    <xsl:param name="lc:showQuestionLabels" as="xs:boolean" tunnel="yes" select="$lc:doShowQuestionLabels"/>
+    
+    <xsl:if test="$lc:doDebug">
+      <!-- Report parameters -->
+      <xsl:message> + [INFO] learning interaction: <xsl:value-of 
+        select="(*[contains(@class, ' learningInteractionBase2-d/lcInteractionLabel2 ')], 
+                 *[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')])[1]"/> </xsl:message>
+      <xsl:message> + [INFO] learning domain parameters: </xsl:message>
+      <xsl:message> + [INFO] - lc-number-questions: "<xsl:value-of select="$lc-number-questions"/>"</xsl:message>
+      <xsl:message> + [INFO] - lc:doNumberQuestions: "<xsl:value-of select="$lc:doNumberQuestions"/>"</xsl:message>
+      <xsl:message> + [INFO] - lc:numberQuestions: "<xsl:value-of select="$lc:numberQuestions"/>"</xsl:message>
+      <xsl:message> + [INFO] - lc-show-only-feedback: "<xsl:value-of select="$lc-show-only-feedback"/>"</xsl:message>
+      <xsl:message> + [INFO] - lc:doShowOnlyFeedback: "<xsl:value-of select="$lc:doShowOnlyFeedback"/>"</xsl:message>
+      <xsl:message> + [INFO] - lc:showOnlyFeedback: "<xsl:value-of select="$lc:showOnlyFeedback"/>"</xsl:message>
+      <xsl:message> + [INFO] - lc-show-feedback: "<xsl:value-of select="$lc-show-feedback"/>"</xsl:message>
+      <xsl:message> + [INFO] - lc:doShowFeedback: "<xsl:value-of select="$lc:doShowFeedback"/>"</xsl:message>
+      <xsl:message> + [INFO] - lc:showFeedback: "<xsl:value-of select="$lc:showFeedback"/>"</xsl:message>
+      <xsl:message> + [INFO] - lc-style-correct-responses: "<xsl:value-of select="$lc-style-correct-responses"/>"</xsl:message>
+      <xsl:message> + [INFO] - lc:doStyleCorrectResponses: "<xsl:value-of select="$lc:doStyleCorrectResponses"/>"</xsl:message>
+      <xsl:message> + [INFO] - lc:styleCorrectResponses: "<xsl:value-of select="$lc:styleCorrectResponses"/>"</xsl:message>
+      <xsl:message> + [INFO] - lc-show-only-correct-answer: "<xsl:value-of select="$lc-show-only-correct-answer"/>"</xsl:message>
+      <xsl:message> + [INFO] - lc:doShowOnlyCorrectAnswer: "<xsl:value-of select="$lc:doShowOnlyCorrectAnswer"/>"</xsl:message>
+      <xsl:message> + [INFO] - lc:showOnlyCorrectAnswer: "<xsl:value-of select="$lc:showOnlyCorrectAnswer"/>"</xsl:message>
+      <xsl:message> + [INFO] - lc-hide-question-labels: "<xsl:value-of select="$lc-hide-question-labels"/>"</xsl:message>
+      <xsl:message> + [INFO] - lc:doShowQuestionLabels: "<xsl:value-of select="$lc:doShowQuestionLabels"/>"</xsl:message>
+      <xsl:message> + [INFO] - lc:showQuestionLabels: "<xsl:value-of select="$lc:showQuestionLabels"/>"</xsl:message>
+      
+      <xsl:message> + [INFO] - lc-question-number-format: "<xsl:value-of select="$lc-question-number-format"/>"</xsl:message>
+      <xsl:message> + [INFO] - lc-question-number-prefix: "<xsl:value-of select="$lc-question-number-prefix"/>"</xsl:message>
+      <xsl:message> + [INFO] - lc-question-number-suffix: "<xsl:value-of select="$lc-question-number-suffix"/>"</xsl:message>
+      <xsl:message> + [INFO] - lc-answer-option-number-format: "<xsl:value-of select="$lc-answer-option-number-format"/>"</xsl:message>
+    </xsl:if>
+    
+    <xsl:next-match/>
+    
+  </xsl:template>
   
   <!-- =====================
        True/False
@@ -390,7 +442,7 @@
             <xsl:apply-templates mode="lc:hotspotFeedback"
               select="*[contains(@class, ' learning2-d/lcArea2 ')] |
                       *[contains(@class, ' learning-d/lcArea ')]">
-              <!-- For hot spots we show the feedback if there's no xrefs in the areas -->
+              <!-- For hot spots we show the feedback if there're no xrefs in the areas -->
               <xsl:with-param name="lc:showFeedback" as="xs:boolean" tunnel="yes"                
                              select="true()"/>
             </xsl:apply-templates>
@@ -561,9 +613,13 @@
   
   <xsl:template name="constructInteraction">
     <xsl:param name="baseClass" as="xs:string*" select="lc:getBaseLcTypeForElement(.)"/>
-    <xsl:param name="lc:showOnlyCorrectAnswer" as="xs:boolean" tunnel="yes"
-      select="$lc:doShowOnlyCorrectAnswer"
-    />
+    <xsl:param name="lc:numberQuestions" as="xs:boolean" tunnel="yes" select="$lc:doNumberQuestions"/>
+    <xsl:param name="lc:showOnlyFeedback" as="xs:boolean" tunnel="yes" select="$lc:doShowOnlyFeedback"/>
+    <xsl:param name="lc:showFeedback" as="xs:boolean" tunnel="yes" select="$lc:doShowFeedback"/>
+    <xsl:param name="lc:styleCorrectResponses" as="xs:boolean" tunnel="yes" select="$lc:doStyleCorrectResponses"/>
+    <xsl:param name="lc:showOnlyCorrectAnswer" as="xs:boolean" tunnel="yes" select="$lc:doShowOnlyCorrectAnswer"/>
+    <xsl:param name="lc:showQuestionLabels" as="xs:boolean" tunnel="yes" select="$lc:doShowQuestionLabels"/>
+
     <xsl:variable name="interactionContents" as="node()*">
     </xsl:variable>
     <div class="lc-interaction-wrapper">
@@ -571,8 +627,14 @@
       <xsl:call-template name="lc-setClassAtt">
         <xsl:with-param name="baseClass" select="$baseClass" as="xs:string*"/>
       </xsl:call-template>
-      <xsl:apply-templates 
-          select="*[contains(@class, ' learningInteractionBase2-d/lcInteractionLabel2 ')]"/>
+      <xsl:if test="$lc:showQuestionLabels">
+        <!-- NOTE: We have to put the control here because interactionLabel2 specializes
+                   topic/p and if there are any higher-priority overrides to topic/p base processing
+                   then our template for lcInteractionLabel2 will never match.
+          -->
+        <xsl:apply-templates 
+            select="*[contains(@class, ' learningInteractionBase2-d/lcInteractionLabel2 ')]"/>
+      </xsl:if>
       <xsl:if test="not($lc:showOnlyCorrectAnswer)">
         <xsl:apply-templates 
           select="*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')] |
@@ -594,7 +656,10 @@
   </xsl:template>
   
   <xsl:template match="lcInteractionLabel2 | *[contains(@class, ' learningInteractionBase2-d/lcInteractionLabel2 ')]" priority="100">
-    <xsl:if test="$lc:doShowQuestionLabels">
+    <xsl:param name="lc:showQuestionLabels" as="xs:boolean" tunnel="yes" select="$lc:doShowQuestionLabels"/>
+    <xsl:message> + [DEBUG] lcInteractionLabel2: lc:showQuestionLabels="<xsl:value-of select="$lc:showQuestionLabels"/>"</xsl:message>
+
+    <xsl:if test="$lc:showQuestionLabels">
       <p>
         <xsl:call-template name="lc-setClassAtt"/>
         <xsl:apply-templates/>
@@ -856,10 +921,11 @@
          cannot be implemented using XSLT alone.
       -->
     <xsl:param name="numberFormat" as="xs:string" select="$lc-question-number-format"/>
+    <xsl:param name="lc:numberQuestions" as="xs:boolean" tunnel="yes" select="$lc:doNumberQuestions"/>
     
     <xsl:variable name="questionNumber" as="xs:string">
       <xsl:choose>
-        <xsl:when test="not($lc:doNumberQuestions)">
+        <xsl:when test="not($lc:numberQuestions)">
           <xsl:sequence select="''"/>
         </xsl:when>
         <xsl:otherwise>
