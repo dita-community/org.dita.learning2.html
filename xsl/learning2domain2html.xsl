@@ -909,10 +909,10 @@
        
   <xsl:template name="lc-setClassAtt">
     <xsl:param name="baseClass" select="lc:getBaseLcTypeForElement(.)" as="xs:string*"/>
-    <xsl:variable name="classAtt" as="attribute()">
+    <xsl:variable name="classAtt" as="attribute()?">
       <xsl:apply-templates select="." mode="set-output-class"/>      
     </xsl:variable>
-    <xsl:attribute name="class" select="($baseClass, string($classAtt))"/>
+    <xsl:attribute name="class" select="if ($classAtt) then ($baseClass, string($classAtt)) else $baseClass"/>
   </xsl:template>     
        
   <xsl:template name="lcGetQuestionNumber">
