@@ -171,6 +171,7 @@
     <xsl:param name="lc:showOnlyCorrectAnswer" as="xs:boolean" tunnel="yes" select="$lc:doShowOnlyCorrectAnswer"/>
     <xsl:param name="lc:showQuestionLabels" as="xs:boolean" tunnel="yes" select="$lc:doShowQuestionLabels"/>
     
+    <xsl:variable name="lc:doDebug" as="xs:boolean" select="false()"/>
     <xsl:if test="$lc:doDebug">
       <!-- Report parameters -->
       <xsl:message> + [INFO] learning interaction: <xsl:value-of 
@@ -212,6 +213,7 @@
   
   <xsl:template match="*[contains(@class, ' learning2-d/lcTrueFalse2 ')] |
                        *[contains(@class, ' learning-d/lcTrueFalse ')]">
+    <xsl:param name="lc:doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
     <xsl:call-template name="constructInteraction"/>    
   </xsl:template>
     
@@ -238,6 +240,7 @@
   
   <xsl:template match="*[contains(@class, ' learning2-d/lcSingleSelect2 ')] |
                        *[contains(@class, ' learning-d/lcSingleSelect ')]">
+    <xsl:param name="lc:doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
     <xsl:call-template name="constructInteraction"/>    
   </xsl:template>
   
@@ -247,8 +250,10 @@
   
   <xsl:template match="*[contains(@class, ' learning2-d/lcAnswerOptionGroup2 ')] |
                        *[contains(@class, ' learning-d/lcAnswerOptionGroup ')]">
+    <xsl:param name="lc:doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
     <ol>
       <xsl:call-template name="lc-setClassAtt">
+        <xsl:with-param name="lc:doDebug" as="xs:boolean" tunnel="yes" select="$lc:doDebug"/>
         <xsl:with-param name="baseClass" select="'lcAnswerOptionGroup'" as="xs:string*"/>
       </xsl:call-template>
       <xsl:apply-templates/>
@@ -258,16 +263,44 @@
    
   <xsl:template match="*[contains(@class, ' learning2-d/lcAnswerOption2 ')] |
                        *[contains(@class, ' learning-d/lcAnswerOption ')]">
+    <xsl:param name="lc:doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
     <xsl:param name="lc:showOnlyCorrectAnswer" as="xs:boolean" tunnel="yes"
       select="$lc:doShowOnlyCorrectAnswer"
     />
+    <xsl:param name="lc:showOnlyFeedback" as="xs:boolean" tunnel="yes"
+      select="$lc:doShowOnlyFeedback"
+    />
+    
+<!--    <xsl:variable name="lc:doDebug" as="xs:boolean" select="true()"/>-->
+    
+    <xsl:if test="$lc:doDebug">
+      <xsl:message> + [DEBUG] lcAnswerOption:  <xsl:value-of select="substring(., 1, 20)"/></xsl:message>
+      <xsl:message> + [DEBUG] lcAnswerOption:    lc:showOnlyFeedback=<xsl:value-of select="$lc:showOnlyFeedback"/></xsl:message>
+      <xsl:message> + [DEBUG] lcAnswerOption:    lc:showOnlyCorrectAnswer=<xsl:value-of select="$lc:showOnlyCorrectAnswer"/></xsl:message>
+    </xsl:if>
     
     <xsl:choose>
-      <xsl:when test="($lc:showOnlyCorrectAnswer and not(lc:isCorrectAnswer(.)))">
-        <!-- Do nothing: incorrect answers are suppressed -->
+      <xsl:when test="$lc:showOnlyCorrectAnswer and not(lc:isCorrectAnswer(.))">
+        <!-- Do nothing: incorrect answers are suppressed when showOnlyCorrectAnswer is true -->
+        <xsl:if test="$lc:doDebug">
+          <xsl:message> + [DEBUG] lcAnswerOption: suppressing answer: showOnlyCorrectAnswer is true and
+                                  not(lc:isCorrectAnswer(.))=<xsl:value-of select="not(lc:isCorrectAnswer(.))"/>
+          </xsl:message>      
+        </xsl:if>
       </xsl:when>
-      <xsl:when test="($lc:showOnlyCorrectAnswer and lc:isCorrectAnswer(.))">
-        <!-- When we're only showing the correct answers, we have to generate
+      <xsl:when test="($lc:showOnlyCorrectAnswer and lc:isCorrectAnswer(.)) or 
+                       ($lc:showOnlyFeedback and 
+                        (.//*[contains(@class, ' learning2-d/lcFeedback2 ') or 
+                              contains(@class, ' learning-d/lcFeedback ')]))">
+        <xsl:if test="$lc:doDebug">
+          <xsl:message> + [DEBUG] lcAnswerOption: lc:showOnlyCorrectAnswer=true and lc:isCorrectAnswer(.))=<xsl:value-of select="not(lc:isCorrectAnswer(.))"/> or
+                                  lc:showOnlyFeedback=true and there is feedback
+                                  
+                                  Showing a correct answer, either the whole answer or just
+                                  the feedback.
+          </xsl:message>      
+        </xsl:if>
+        <!-- When we're only showing the correct answers, or showing feedback we have to generate
              the answer option label.
           -->
         <div>
@@ -279,7 +312,7 @@
           </xsl:call-template>
           <xsl:apply-templates select="." mode="lc-set-answer-option-label"/>
           <span class="lc-answer-option-content">
-            <xsl:apply-templates select="if ($lc:doShowOnlyFeedback) 
+            <xsl:apply-templates select="if ($lc:showOnlyFeedback) 
               then (*[contains(@class, ' learning-d/lcFeedback ')] | 
                     *[contains(@class, ' learning2-d/lcFeedback2 ')])
               else node()"
@@ -287,7 +320,14 @@
           </span>
         </div>
       </xsl:when>
-      <xsl:otherwise>
+      <xsl:when test="not($lc:showOnlyFeedback) or 
+                      ($lc:showOnlyFeedback and 
+                       (*[contains(@class, ' learning-d/lcFeedback ')] | 
+                        *[contains(@class, ' learning2-d/lcFeedback2 ')]))">
+        
+        <xsl:if test="$lc:doDebug">
+          <xsl:message> + [DEBUG] lcAnswerOption: Normal answer option processing. </xsl:message>      
+        </xsl:if>
         <li>
           <xsl:call-template name="lc-setClassAtt">
             <xsl:with-param name="baseClass" 
@@ -300,6 +340,12 @@
             <xsl:apply-templates/>
           </div>
         </li>
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- Must be show only feedback but there's no feedback. -->
+        <xsl:if test="$lc:doDebug">
+          <xsl:message> + [DEBUG] lcAnswerOption: No output, must be show-only-feedback but there's no feedback. </xsl:message>      
+        </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -612,6 +658,7 @@
        ==================================================== -->
   
   <xsl:template name="constructInteraction">
+    <xsl:param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
     <xsl:param name="baseClass" as="xs:string*" select="lc:getBaseLcTypeForElement(.)"/>
     <xsl:param name="lc:numberQuestions" as="xs:boolean" tunnel="yes" select="$lc:doNumberQuestions"/>
     <xsl:param name="lc:showOnlyFeedback" as="xs:boolean" tunnel="yes" select="$lc:doShowOnlyFeedback"/>
@@ -619,12 +666,20 @@
     <xsl:param name="lc:styleCorrectResponses" as="xs:boolean" tunnel="yes" select="$lc:doStyleCorrectResponses"/>
     <xsl:param name="lc:showOnlyCorrectAnswer" as="xs:boolean" tunnel="yes" select="$lc:doShowOnlyCorrectAnswer"/>
     <xsl:param name="lc:showQuestionLabels" as="xs:boolean" tunnel="yes" select="$lc:doShowQuestionLabels"/>
+    
+<!--    <xsl:variable name="doDebug" as="xs:boolean" select="true()"/>-->
+    
+    <xsl:if test="$doDebug">
+      <xsl:message> + [DEBUG] constructInteraction: Starting...</xsl:message>
+      <xsl:message> + [DEBUG]       lc:showOnlyFeedback=<xsl:value-of select="$lc:showOnlyFeedback"/></xsl:message>
+    </xsl:if>
 
     <xsl:variable name="interactionContents" as="node()*">
     </xsl:variable>
     <div class="lc-interaction-wrapper">
       <xsl:call-template name="commonattributes"/>
       <xsl:call-template name="lc-setClassAtt">
+        <xsl:with-param name="lc:doDebug" as="xs:boolean" tunnel="yes" select="$lc:doDebug"/>
         <xsl:with-param name="baseClass" select="$baseClass" as="xs:string*"/>
       </xsl:call-template>
       <xsl:if test="$lc:showQuestionLabels">
@@ -633,13 +688,17 @@
                    then our template for lcInteractionLabel2 will never match.
           -->
         <xsl:apply-templates 
-            select="*[contains(@class, ' learningInteractionBase2-d/lcInteractionLabel2 ')]"/>
+            select="*[contains(@class, ' learningInteractionBase2-d/lcInteractionLabel2 ')]">
+          <xsl:with-param name="lc:doDebug" as="xs:boolean" tunnel="yes" select="$lc:doDebug"/>
+        </xsl:apply-templates>
       </xsl:if>
-      <xsl:if test="not($lc:showOnlyCorrectAnswer)">
+      <xsl:if test="not($lc:showOnlyCorrectAnswer or $lc:showOnlyFeedback)">
         <xsl:apply-templates 
           select="*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')] |
                   *[contains(@class, ' learningInteractionBase-d/lcQuestionBase ')]"
-        />
+        >
+          <xsl:with-param name="lc:doDebug" as="xs:boolean" tunnel="yes" select="$lc:doDebug"/>
+        </xsl:apply-templates>
       </xsl:if>
       <!-- The question options, whatever form they might take: -->
       <xsl:apply-templates 
@@ -651,11 +710,14 @@
                 *[contains(@class, ' learning-d/lcMatchTable ')] |
                 *[contains(@class, ' learning2-d/lcHotspotMap2 ')] |
                 *[contains(@class, ' learning-d/lcHotspotMap ')]"
-      />
+      >
+        <xsl:with-param name="lc:doDebug" as="xs:boolean" tunnel="yes" select="$lc:doDebug"/>
+      </xsl:apply-templates>
     </div>
   </xsl:template>
   
   <xsl:template match="lcInteractionLabel2 | *[contains(@class, ' learningInteractionBase2-d/lcInteractionLabel2 ')]" priority="100">
+    <xsl:param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
     <xsl:param name="lc:showQuestionLabels" as="xs:boolean" tunnel="yes" select="$lc:doShowQuestionLabels"/>
     <xsl:message> + [DEBUG] lcInteractionLabel2: lc:showQuestionLabels="<xsl:value-of select="$lc:showQuestionLabels"/>"</xsl:message>
 
@@ -668,6 +730,7 @@
   </xsl:template>
   
   <xsl:template match="*[contains(@class, ' learningInteractionBase-d/lcQuestionBase ')]">
+    <xsl:param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
     <xsl:variable name="baseClass" as="xs:string*"
       select="concat(lc:getBaseLcTypeForElement(..), 'Question')"
     />
@@ -682,6 +745,7 @@
   </xsl:template>
   
   <xsl:template match="*[contains(@class, ' learningInteractionBase2-d/lcQuestionBase2 ')]">
+    <xsl:param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
     <xsl:variable name="baseClass" as="xs:string*"
       select="concat(lc:getBaseLcTypeForElement(..), 'Question')"
     />
@@ -736,6 +800,7 @@
   </xsl:template>
   
   <xsl:template mode="lc:addQuestionNumberToBlock" match="*[contains(@class, ' topic/p ')]">
+    <xsl:param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
     <xsl:param name="questionNumber" as="node()*"/>
     <p>
       <xsl:call-template name="commonattributes"/>
@@ -746,10 +811,12 @@
   </xsl:template>
   
   <xsl:template mode="lc:addQuestionNumberToBlock" match="*" priority="-1">
+    <xsl:param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
     <xsl:message> + [WARN] lc:addQuestionNumberToBlock: Unhandled element <xsl:value-of select="concat(name(..), '/', name(.))"/></xsl:message>
   </xsl:template>
 
   <xsl:template match="*[contains(@class, ' learning-d/lcAnswerContent ')]">
+    <xsl:param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
     <span>
       <xsl:call-template name="lc-setClassAtt"/>
       <xsl:apply-templates/>
@@ -757,6 +824,7 @@
   </xsl:template>
   
   <xsl:template match="*[contains(@class, ' learning2-d/lcAnswerContent2 ')]">
+    <xsl:param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
     <span>
       <xsl:call-template name="lc-setClassAtt"/>
       <xsl:apply-templates/>
@@ -769,6 +837,7 @@
                        *[contains(@class, ' learning-d/lcFeedbackCorrect ')] |
                        *[contains(@class, ' learning2-d/lcOpenAnswer2 ')] |
                        *[contains(@class, ' learning-d/lcOpenAnswer ')]">
+    <xsl:param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
     <xsl:param name="lc:showFeedback" as="xs:boolean" tunnel="yes"
       select="$lc:doShowFeedback"
     />
@@ -792,6 +861,7 @@
   </xsl:template>
   
   <xsl:template match="*" mode="lc:generate-feedback-label">
+    <xsl:param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
     <!-- No default feedback label. Implement templates in this mode to generate
          feedback labels.
       -->
@@ -908,6 +978,7 @@
   </xsl:function>
        
   <xsl:template name="lc-setClassAtt">
+    <xsl:param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
     <xsl:param name="baseClass" select="lc:getBaseLcTypeForElement(.)" as="xs:string*"/>
     <xsl:variable name="classAtt" as="attribute()?">
       <xsl:apply-templates select="." mode="set-output-class"/>      
@@ -920,6 +991,7 @@
          map-driven processing some of the possible options
          cannot be implemented using XSLT alone.
       -->
+    <xsl:param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
     <xsl:param name="numberFormat" as="xs:string" select="$lc-question-number-format"/>
     <xsl:param name="lc:numberQuestions" as="xs:boolean" tunnel="yes" select="$lc:doNumberQuestions"/>
     
