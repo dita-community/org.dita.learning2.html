@@ -298,7 +298,7 @@
                                   
                                   Showing a correct answer, either the whole answer or just
                                   the feedback.
-          </xsl:message>      
+          </xsl:message>
         </xsl:if>
         <!-- When we're only showing the correct answers, or showing feedback we have to generate
              the answer option label.
