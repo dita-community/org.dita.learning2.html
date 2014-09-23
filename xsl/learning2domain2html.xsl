@@ -165,14 +165,14 @@
     <xsl:param name="lc:doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
     
     <xsl:param name="lc:numberQuestions" as="xs:boolean" tunnel="yes" select="$lc:doNumberQuestions"/>
-    <xsl:param name="lc:showOnlyFeedback" as="xs:boolean" tunnel="yes" select="$lc:doShowOnlyFeedback"/>
-    <xsl:param name="lc:showFeedback" as="xs:boolean" tunnel="yes" select="$lc:doShowFeedback"/>
+    <xsl:param name="lc:showOnlyFeedback" as="xs:boolean" tunnel="yes"  select="$lc:doShowOnlyFeedback"/>
+    <xsl:param name="lc:showFeedback" as="xs:boolean" tunnel="yes" 
+      select="$lc:doShowFeedback or $lc:showOnlyFeedback"/>
     <xsl:param name="lc:styleCorrectResponses" as="xs:boolean" tunnel="yes" select="$lc:doStyleCorrectResponses"/>
     <xsl:param name="lc:showOnlyCorrectAnswer" as="xs:boolean" tunnel="yes" select="$lc:doShowOnlyCorrectAnswer"/>
     <xsl:param name="lc:showQuestionLabels" as="xs:boolean" tunnel="yes" select="$lc:doShowQuestionLabels"/>
     
-    <xsl:variable name="lc:doDebug" as="xs:boolean" select="false()"/>
-    <xsl:if test="$lc:doDebug">
+    <xsl:if test="false() or $lc:doDebug"><!-- Disabling because it's very verbose -->
       <!-- Report parameters -->
       <xsl:message> + [INFO] learning interaction: <xsl:value-of 
         select="(*[contains(@class, ' learningInteractionBase2-d/lcInteractionLabel2 ')], 
@@ -268,13 +268,15 @@
       select="$lc:doShowOnlyCorrectAnswer"
     />
     <xsl:param name="lc:showOnlyFeedback" as="xs:boolean" tunnel="yes"
-      select="$lc:doShowOnlyFeedback"
+       select="$lc:doShowOnlyFeedback"
     />
-    
+    <xsl:param name="topicref" as="element()" select="." tunnel="yes"/>    
 <!--    <xsl:variable name="lc:doDebug" as="xs:boolean" select="true()"/>-->
     
-    <xsl:if test="$lc:doDebug">
+    <xsl:if test="true() or $lc:doDebug">
       <xsl:message> + [DEBUG] lcAnswerOption:  <xsl:value-of select="substring(., 1, 20)"/></xsl:message>
+      <xsl:message> + [DEBUG] lcAnswerOption:    topicref=<xsl:sequence select="$topicref"/></xsl:message>
+      <xsl:message> + [DEBUG] lcAnswerOption:    lc:doDebug=<xsl:value-of select="$lc:doDebug"/></xsl:message>
       <xsl:message> + [DEBUG] lcAnswerOption:    lc:showOnlyFeedback=<xsl:value-of select="$lc:showOnlyFeedback"/></xsl:message>
       <xsl:message> + [DEBUG] lcAnswerOption:    lc:showOnlyCorrectAnswer=<xsl:value-of select="$lc:showOnlyCorrectAnswer"/></xsl:message>
     </xsl:if>
@@ -662,14 +664,15 @@
     <xsl:param name="baseClass" as="xs:string*" select="lc:getBaseLcTypeForElement(.)"/>
     <xsl:param name="lc:numberQuestions" as="xs:boolean" tunnel="yes" select="$lc:doNumberQuestions"/>
     <xsl:param name="lc:showOnlyFeedback" as="xs:boolean" tunnel="yes" select="$lc:doShowOnlyFeedback"/>
-    <xsl:param name="lc:showFeedback" as="xs:boolean" tunnel="yes" select="$lc:doShowFeedback"/>
+    <xsl:param name="lc:showFeedback" as="xs:boolean" tunnel="yes" 
+      select="$lc:doShowFeedback or $lc:showOnlyFeedback"/>
     <xsl:param name="lc:styleCorrectResponses" as="xs:boolean" tunnel="yes" select="$lc:doStyleCorrectResponses"/>
     <xsl:param name="lc:showOnlyCorrectAnswer" as="xs:boolean" tunnel="yes" select="$lc:doShowOnlyCorrectAnswer"/>
     <xsl:param name="lc:showQuestionLabels" as="xs:boolean" tunnel="yes" select="$lc:doShowQuestionLabels"/>
     
 <!--    <xsl:variable name="doDebug" as="xs:boolean" select="true()"/>-->
     
-    <xsl:if test="$doDebug">
+    <xsl:if test="true() or $doDebug">
       <xsl:message> + [DEBUG] constructInteraction: Starting...</xsl:message>
       <xsl:message> + [DEBUG]       lc:showOnlyFeedback=<xsl:value-of select="$lc:showOnlyFeedback"/></xsl:message>
     </xsl:if>
@@ -838,8 +841,11 @@
                        *[contains(@class, ' learning2-d/lcOpenAnswer2 ')] |
                        *[contains(@class, ' learning-d/lcOpenAnswer ')]">
     <xsl:param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
+    <xsl:param name="lc:showOnlyFeedback" as="xs:boolean" tunnel="yes"
+      select="$lc:doShowOnlyFeedback"
+    />
     <xsl:param name="lc:showFeedback" as="xs:boolean" tunnel="yes"
-      select="$lc:doShowFeedback"
+      select="$lc:doShowFeedback or $lc:showOnlyFeedback"
     />
     
     <xsl:if test="$lc:showFeedback">
