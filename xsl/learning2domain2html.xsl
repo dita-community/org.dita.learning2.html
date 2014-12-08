@@ -722,7 +722,9 @@
   <xsl:template match="lcInteractionLabel2 | *[contains(@class, ' learningInteractionBase2-d/lcInteractionLabel2 ')]" priority="100">
     <xsl:param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
     <xsl:param name="lc:showQuestionLabels" as="xs:boolean" tunnel="yes" select="$lc:doShowQuestionLabels"/>
-    <xsl:message> + [DEBUG] lcInteractionLabel2: lc:showQuestionLabels="<xsl:value-of select="$lc:showQuestionLabels"/>"</xsl:message>
+    <xsl:if test="$doDebug">
+      <xsl:message> + [DEBUG] lcInteractionLabel2: lc:showQuestionLabels="<xsl:value-of select="$lc:showQuestionLabels"/>"</xsl:message>
+    </xsl:if>
 
     <xsl:if test="$lc:showQuestionLabels">
       <p>
