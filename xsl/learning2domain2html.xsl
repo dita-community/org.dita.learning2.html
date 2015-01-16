@@ -1026,4 +1026,12 @@
       </span>
     </xsl:if>
   </xsl:template>
+   <!--Output lctime which is derived from date and is not visible by default.-->  
+    <xsl:template match="*[contains(@class, ' learningBase/lcTime ')]">
+    <span>
+      <xsl:call-template name="lc-setClassAtt"/>
+      <b>Time:</b> <xsl:apply-templates/>
+    </span>
+  </xsl:template>
+
 </xsl:stylesheet>
